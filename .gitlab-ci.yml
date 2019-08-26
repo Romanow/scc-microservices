@@ -4,6 +4,5 @@ build:
   cache:
     paths:
     - .gradle
-    - .m2
   script:
   - gradle clean build

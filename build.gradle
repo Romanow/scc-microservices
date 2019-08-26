@@ -1,15 +1,11 @@
 plugins {
     id "org.springframework.boot" version "2.1.7.RELEASE"
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
-    id "org.springframework.cloud.contract" version "2.1.2.RELEASE"
-    id "org.asciidoctor.gradle.asciidoctor" version  "1.5.1"
 }
 
 configure(subprojects) { project ->
     apply plugin: 'java'
     apply plugin: 'idea'
-    apply plugin: 'maven-publish'
-    apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
     apply from: '../libraries.gradle'
 
@@ -44,16 +40,12 @@ configure(subprojects) { project ->
 
         // Utils
         compileOnly "com.google.code.findbugs:jsr305:${findBugsVersion}"
-        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        compile "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
         // Test
         testImplementation "org.springframework.boot:spring-boot-starter-test"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
-    }
-
-    bootJar {
-        archiveFileName = "${project.name}.jar"
     }
 }

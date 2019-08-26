@@ -1,0 +1,10 @@
+plugins {
+    id "org.springframework.cloud.contract" version "2.1.2.RELEASE"
+    id "org.asciidoctor.gradle.asciidoctor" version  "1.5.1"
+}
+
+apply plugin: 'org.springframework.boot'
+
+bootJar {
+    archiveFileName = "warehouse.jar"
+}
