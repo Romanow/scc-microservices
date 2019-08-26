@@ -1,0 +1,9 @@
+build:
+  stage: build
+  image: gradle:jdk11
+  cache:
+    paths:
+    - .gradle
+    - .m2
+  script:
+  - gradle clean build

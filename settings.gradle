@@ -1,0 +1,6 @@
+rootProject.name = 'heisenbug-conf'
+
+include 'warehouse'
+include 'orders'
+include 'delivery'
+
