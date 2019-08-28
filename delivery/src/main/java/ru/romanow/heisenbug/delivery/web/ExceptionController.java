@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.romanow.heisenbug.delivery.exceptions.RestRequestException;
 import ru.romanow.heisenbug.delivery.model.ErrorResponse;
 
 import java.util.List;
@@ -17,13 +18,19 @@ public class ExceptionController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public @ResponseBody
-    ErrorResponse handleBadRequest(MethodArgumentNotValidException exception) {
+    public @ResponseBody ErrorResponse handleBadRequest(MethodArgumentNotValidException exception) {
         String validationErrors = prepareValidationErrors(exception.getBindingResult().getFieldErrors());
         if (logger.isDebugEnabled()) {
             logger.debug("Bad Request: {}", validationErrors);
         }
         return new ErrorResponse(validationErrors);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(RestRequestException.class)
+    public @ResponseBody ErrorResponse conflict(RestRequestException exception) {
+        logger.warn(exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

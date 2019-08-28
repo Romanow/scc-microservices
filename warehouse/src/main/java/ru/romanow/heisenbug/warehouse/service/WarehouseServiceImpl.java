@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.romanow.heisenbug.warehouse.domain.Items;
 import ru.romanow.heisenbug.warehouse.domain.OrderItems;
 import ru.romanow.heisenbug.warehouse.domain.enums.OrderState;
+import ru.romanow.heisenbug.warehouse.exceptions.EntityAvailableException;
 import ru.romanow.heisenbug.warehouse.model.ItemsFullInfoResponse;
 import ru.romanow.heisenbug.warehouse.model.ItemsShortInfo;
 import ru.romanow.heisenbug.warehouse.model.OrderItemResponse;
@@ -40,6 +41,14 @@ public class WarehouseServiceImpl
     @Nonnull
     @Override
     @Transactional(readOnly = true)
+    public OrderItems getOrderByUid(@Nonnull UUID orderUid) {
+        return orderItemsRepository.findByOrderUid(orderUid)
+                .orElseThrow(() -> new EntityNotFoundException(format("OrderItem '%s' not found", orderUid)));
+    }
+
+    @Nonnull
+    @Override
+    @Transactional(readOnly = true)
     public List<ItemsFullInfoResponse> items(@Nonnull Integer page, @Nonnull Integer size) {
         final Pageable pageable = size > 0 ? of(page, size) : unpaged();
         return itemsRepository.findAll(pageable)
@@ -52,7 +61,7 @@ public class WarehouseServiceImpl
     @Override
     @Transactional(readOnly = true)
     public OrderItemResponse orderItemState(@Nonnull UUID orderUid) throws EntityNotFoundException {
-        final OrderItems orderItems = orderItemsRepository.findByOrderUid(orderUid);
+        final OrderItems orderItems = getOrderByUid(orderUid);
         return buildOrderItemsResponse(orderItems);
     }
 
@@ -68,7 +77,7 @@ public class WarehouseServiceImpl
 
         final List<Items> absentItems = items.stream().filter(item -> item.getCount() == 0).collect(toUnmodifiableList());
         if (absentItems.size() != 0) {
-            throw new EntityNotFoundException(format("Items [%s] is empty (available count = 0)", on(",").join(absentItems)));
+            throw new EntityAvailableException(format("Items [%s] is empty (available count = 0)", on(",").join(absentItems)));
         }
 
         OrderItems orderItems = new OrderItems()
@@ -96,12 +105,12 @@ public class WarehouseServiceImpl
     @Override
     @Transactional
     public OrderItemResponse checkout(@Nonnull UUID orderUid) {
-        final OrderItems orderItems = orderItemsRepository.findByOrderUid(orderUid);
-        orderItems.setState(OrderState.DELIVERED);
+        final OrderItems orderItems = getOrderByUid(orderUid);
+        orderItems.setState(OrderState.READY_FOR_DELIVERY);
         orderItemsRepository.save(orderItems);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Update orderItem state: {}, '{}'", OrderState.DELIVERED, orderItems);
+            logger.debug("Update orderItem state: {}, '{}'", OrderState.READY_FOR_DELIVERY, orderItems);
         }
         return buildOrderItemsResponse(orderItems);
     }

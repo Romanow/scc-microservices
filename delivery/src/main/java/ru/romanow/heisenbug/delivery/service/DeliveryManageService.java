@@ -6,5 +6,5 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public interface DeliveryManageService {
-    DeliveryStatusResponse deliver(@Nonnull UUID orderUid, @Nonnull DeliveryRequest request);
+    void deliver(@Nonnull UUID orderUid, @Nonnull DeliveryRequest request);
 }

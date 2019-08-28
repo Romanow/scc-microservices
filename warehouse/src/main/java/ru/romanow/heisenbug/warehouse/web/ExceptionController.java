@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.romanow.heisenbug.warehouse.exceptions.EntityAvailableException;
 import ru.romanow.heisenbug.warehouse.model.ErrorResponse;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,20 @@ public class ExceptionController {
             logger.debug("Bad Request: {}", validationErrors);
         }
         return new ErrorResponse(validationErrors);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(EntityNotFoundException.class)
+    public @ResponseBody ErrorResponse handleException(EntityNotFoundException exception) {
+        logger.warn(exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(EntityAvailableException.class)
+    public @ResponseBody ErrorResponse conflict(EntityAvailableException exception) {
+        logger.warn(exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

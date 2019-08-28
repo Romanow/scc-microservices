@@ -1,6 +1,7 @@
 package ru.romanow.heisenbug.delivery.web;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.romanow.heisenbug.delivery.model.DeliveryRequest;
@@ -15,10 +16,11 @@ import java.util.UUID;
 public class DeliveryController {
     private final DeliveryManageService deliveryManageService;
 
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping(value = "/{orderUid}/deliver",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public DeliveryStatusResponse deliver(@PathVariable UUID orderUid, @Valid @RequestBody DeliveryRequest request) {
-        return deliveryManageService.deliver(orderUid, request);
+    public void deliver(@PathVariable UUID orderUid, @Valid @RequestBody DeliveryRequest request) {
+        deliveryManageService.deliver(orderUid, request);
     }
 }

@@ -15,33 +15,33 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/items")
 @RequiredArgsConstructor
 public class WarehouseController {
     private final WarehouseService warehouseService;
 
-    @GetMapping(value = "/items", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<ItemsFullInfoResponse> items(
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "0") Integer size) {
         return warehouseService.items(page, size);
     }
 
-    @GetMapping(value = "/items/{orderUid}/state", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/{orderUid}/state", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public OrderItemResponse orderItemState(@PathVariable UUID orderUid) {
         return warehouseService.orderItemState(orderUid);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "/items/{orderUid}/take",
+    @PostMapping(value = "/{orderUid}/take",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public void takeItems(@PathVariable UUID orderUid, @Valid @RequestBody TakeItemsRequest request) {
-        warehouseService.takeItems(orderUid, request);
+    public OrderItemResponse takeItems(@PathVariable UUID orderUid, @Valid @RequestBody TakeItemsRequest request) {
+        return warehouseService.takeItems(orderUid, request);
     }
 
-    @PostMapping(value = "/items/{itemUid}/checkout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ItemsFullInfoResponse checkout(@PathVariable UUID itemUid) {
-        return warehouseService.checkout(itemUid);
+    @PostMapping(value = "/{orderUid}/checkout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public OrderItemResponse checkout(@PathVariable UUID orderUid) {
+        return warehouseService.checkout(orderUid);
     }
 }
