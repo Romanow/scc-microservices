@@ -1,26 +1,24 @@
 package ru.romanow.heisenbug.warehouse.service;
 
-import ru.romanow.heisenbug.warehouse.model.ItemResponse;
+import ru.romanow.heisenbug.warehouse.model.ItemsFullInfoResponse;
+import ru.romanow.heisenbug.warehouse.model.OrderItemResponse;
 import ru.romanow.heisenbug.warehouse.model.TakeItemsRequest;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
 
 public interface WarehouseService {
 
     @Nonnull
-    List<ItemResponse> items(@Nullable Integer page, @Nonnull Integer size);
+    List<ItemsFullInfoResponse> items(@Nonnull Integer page, @Nonnull Integer size);
 
     @Nonnull
-    ItemResponse itemState(@Nonnull UUID itemUid)
-            throws EntityNotFoundException;
+    OrderItemResponse orderItemState(@Nonnull UUID orderUid);
 
     @Nonnull
-    List<ItemResponse> takeItems(@Nonnull TakeItemsRequest request);
+    OrderItemResponse takeItems(@Nonnull UUID orderUid, @Nonnull TakeItemsRequest request);
 
     @Nonnull
-    ItemResponse checkout(@Nonnull UUID itemUid);
+    OrderItemResponse checkout(@Nonnull UUID orderUid);
 }

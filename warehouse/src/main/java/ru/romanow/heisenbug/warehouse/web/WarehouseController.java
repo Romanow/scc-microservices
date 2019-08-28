@@ -1,9 +1,12 @@
 package ru.romanow.heisenbug.warehouse.web;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.romanow.heisenbug.warehouse.model.ItemResponse;
+import ru.romanow.heisenbug.warehouse.model.ItemsFullInfoResponse;
+import ru.romanow.heisenbug.warehouse.model.OrderItemResponse;
 import ru.romanow.heisenbug.warehouse.model.TakeItemsRequest;
 import ru.romanow.heisenbug.warehouse.service.WarehouseService;
 
@@ -18,26 +21,27 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
 
     @GetMapping(value = "/items", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public List<ItemResponse> items(
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false, defaultValue = "-1") Integer size) {
+    public List<ItemsFullInfoResponse> items(
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "0") Integer size) {
         return warehouseService.items(page, size);
     }
 
-    @GetMapping(value = "/items/{itemUid}/state", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ItemResponse itemState(@PathVariable UUID itemUid) {
-        return warehouseService.itemState(itemUid);
+    @GetMapping(value = "/items/{orderUid}/state", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public OrderItemResponse orderItemState(@PathVariable UUID orderUid) {
+        return warehouseService.orderItemState(orderUid);
     }
 
-    @PostMapping(value = "/items/take",
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(value = "/items/{orderUid}/take",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public List<ItemResponse> takeItems(@Valid @RequestBody TakeItemsRequest request) {
-        return warehouseService.takeItems(request);
+    public void takeItems(@PathVariable UUID orderUid, @Valid @RequestBody TakeItemsRequest request) {
+        warehouseService.takeItems(orderUid, request);
     }
 
     @PostMapping(value = "/items/{itemUid}/checkout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ItemResponse checkout(@PathVariable UUID itemUid) {
+    public ItemsFullInfoResponse checkout(@PathVariable UUID itemUid) {
         return warehouseService.checkout(itemUid);
     }
 }
