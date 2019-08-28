@@ -1,6 +1,8 @@
 package ru.romanow.heisenbug.orders.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import ru.romanow.heisenbug.orders.model.enums.OrderState;
 
@@ -9,11 +11,10 @@ import java.util.UUID;
 
 @Data
 @Accessors(chain = true)
-public class OrderInfoResponse {
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderItemResponse {
     private UUID orderUid;
-    private String firstName;
-    private String lastName;
-    private String address;
     private OrderState state;
     private List<ItemsInfo> items;
 }

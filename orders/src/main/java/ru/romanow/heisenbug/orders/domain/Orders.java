@@ -21,8 +21,8 @@ public class Orders {
     @Column(name = "uid", nullable = false, updatable = false)
     private UUID uid;
 
-    @Column(name = "item_uid", nullable = false, updatable = false)
-    private UUID itemUid;
+    @Column(name = "items_uids", nullable = false, updatable = false)
+    private String items;
 
     @Column(name = "first_name", length = 80)
     private String firstName;
@@ -39,19 +39,19 @@ public class Orders {
         if (o == null || getClass() != o.getClass()) return false;
         Orders orders = (Orders) o;
         return Objects.equal(uid, orders.uid) &&
-                Objects.equal(itemUid, orders.itemUid);
+                Objects.equal(items, orders.items);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(uid, itemUid);
+        return Objects.hashCode(uid, items);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("uid", uid)
-                .add("itemUid", itemUid)
+                .add("items", items)
                 .add("firstName", firstName)
                 .add("lastName", lastName)
                 .add("address", address)

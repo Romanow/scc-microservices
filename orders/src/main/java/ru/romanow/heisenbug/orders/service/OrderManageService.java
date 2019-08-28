@@ -12,7 +12,7 @@ public interface OrderManageService {
     UUID makeOrder(@Nonnull OrderRequest request);
 
     @Nonnull
-    OrderInfoResponse getStatus(@Nonnull UUID orderUid);
+    OrderInfoResponse status(@Nonnull UUID orderUid);
 
     @Nonnull
     OrderInfoResponse process(@Nonnull UUID orderUid);

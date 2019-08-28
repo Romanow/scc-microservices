@@ -26,7 +26,7 @@ public class OrdersController {
 
     @GetMapping(value = "/{orderUid}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public OrderInfoResponse status(@PathVariable UUID orderUid) {
-        return orderService.getStatus(orderUid);
+        return orderService.status(orderUid);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

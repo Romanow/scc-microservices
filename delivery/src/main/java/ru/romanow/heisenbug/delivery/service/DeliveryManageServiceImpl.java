@@ -25,7 +25,7 @@ public class DeliveryManageServiceImpl
         implements DeliveryManageService {
     private static final Logger logger = getLogger(DeliveryManageServiceImpl.class);
 
-    private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items";
+    private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
     private static final String CHECKOUT_PATH = "/checkout";
 
     private final RestTemplate restTemplate;
