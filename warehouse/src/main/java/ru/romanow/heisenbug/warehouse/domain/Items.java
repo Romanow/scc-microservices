@@ -33,7 +33,7 @@ public class Items {
     @Column(name = "count")
     private Integer count;
 
-    @ManyToMany(mappedBy = "item")
+    @ManyToMany(mappedBy = "items")
     private List<OrderItems> orderItems;
 
     public Integer decrementCount() {

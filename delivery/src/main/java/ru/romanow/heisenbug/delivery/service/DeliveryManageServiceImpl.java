@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
@@ -33,15 +34,7 @@ public class DeliveryManageServiceImpl
 
     @Override
     public void deliver(@Nonnull UUID orderUid, @Nonnull DeliveryRequest request) {
-        final String url = format("%s%s%s", WAREHOUSE_URL, orderUid, CHECKOUT_PATH);
-        final OrderItemResponse response;
-        try {
-            response = restTemplate.postForObject(url, null, OrderItemResponse.class);
-        } catch (RestClientResponseException exception) {
-            final String message = format("Error request to '%s': %d:%s", url, exception.getRawStatusCode(), exception.getResponseBodyAsString());
-            throw new RestRequestException(message);
-        }
-
+        final OrderItemResponse response = makeWarehouseCheckoutRequest(orderUid);
         if (response.getState() != OrderState.READY_FOR_DELIVERY) {
             throw new IllegalArgumentException(format("Order '%s' has invalid state", orderUid));
         }
@@ -54,8 +47,19 @@ public class DeliveryManageServiceImpl
                 .setAddress(request.getAddress());
 
         delivery = deliveryRepository.save(delivery);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Created new delivery '{}'", delivery);
+        logger.debug("Created new delivery '{}'", delivery);
+    }
+
+    @Nonnull
+    private OrderItemResponse makeWarehouseCheckoutRequest(@Nonnull UUID orderUid) {
+        final String url = format("%s%s%s", WAREHOUSE_URL, orderUid, CHECKOUT_PATH);
+        try {
+            return ofNullable(restTemplate.getForObject(url, OrderItemResponse.class))
+                    .orElseThrow(() -> new RestRequestException("Warehouse returned empty response"));
+        } catch (RestClientResponseException exception) {
+            final String message = format("Error request to '%s': %d:%s", url, exception.getRawStatusCode(), exception.getResponseBodyAsString());
+            throw new RestRequestException(message);
         }
+
     }
 }

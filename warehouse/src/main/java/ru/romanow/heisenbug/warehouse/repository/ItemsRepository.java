@@ -11,6 +11,6 @@ import java.util.UUID;
 public interface ItemsRepository
         extends JpaRepository<Items, Integer> {
 
-    @Query("select it from Items it where it.uid in :itemUids")
+    @Query("select it from Items it where it.uid in :itemsUids")
     List<Items> findByUids(@Param("itemsUids") List<UUID> itemsUid);
 }
