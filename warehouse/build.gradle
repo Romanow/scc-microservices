@@ -19,6 +19,7 @@ publishing {
 contracts {
     baseClassMappings {
         baseClassMapping ".*items.*", "ru.romanow.heisenbug.warehouse.web.BaseItemsControllerTest"
+        baseClassMapping ".*checkout.*", "ru.romanow.heisenbug.warehouse.web.BaseCheckoutControllerTest"
     }
     basePackageForTests = "ru.romanow.heisenbug.warehouse.web"
     testFramework = "JUNIT5"

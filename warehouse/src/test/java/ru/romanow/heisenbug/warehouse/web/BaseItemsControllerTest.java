@@ -13,7 +13,6 @@ import java.util.UUID;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 public class BaseItemsControllerTest
