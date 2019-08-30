@@ -3,7 +3,32 @@ plugins {
     id "org.asciidoctor.gradle.asciidoctor" version  "1.5.1"
 }
 
-apply plugin: 'org.springframework.boot'
+apply plugin: "org.springframework.boot"
+apply plugin: "spring-cloud-contract"
+apply plugin: "maven-publish"
+
+publishing {
+    publications {
+        stubs(MavenPublication) {
+            artifactId project.name
+            artifact verifierStubsJar
+        }
+    }
+}
+
+contracts {
+    baseClassMappings {
+        baseClassMapping ".*items.*", "ru.romanow.heisenbug.warehouse.web.BaseItemsControllerTest"
+    }
+    basePackageForTests = "ru.romanow.heisenbug.warehouse.web"
+    testFramework = "JUNIT5"
+}
+
+dependencies {
+    testImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    testImplementation "org.springframework.cloud:spring-cloud-contract-spec:${springContractVersion}"
+    testImplementation "org.springframework.cloud:spring-cloud-starter-contract-verifier:${springContractVersion}"
+}
 
 bootJar {
     archiveFileName = "warehouse.jar"
