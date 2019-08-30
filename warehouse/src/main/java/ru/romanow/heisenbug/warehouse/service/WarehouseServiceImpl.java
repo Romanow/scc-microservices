@@ -3,6 +3,7 @@ package ru.romanow.heisenbug.warehouse.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,10 +11,7 @@ import ru.romanow.heisenbug.warehouse.domain.Items;
 import ru.romanow.heisenbug.warehouse.domain.OrderItems;
 import ru.romanow.heisenbug.warehouse.domain.enums.OrderState;
 import ru.romanow.heisenbug.warehouse.exceptions.EntityAvailableException;
-import ru.romanow.heisenbug.warehouse.model.ItemsFullInfoResponse;
-import ru.romanow.heisenbug.warehouse.model.ItemsShortInfo;
-import ru.romanow.heisenbug.warehouse.model.OrderItemResponse;
-import ru.romanow.heisenbug.warehouse.model.TakeItemsRequest;
+import ru.romanow.heisenbug.warehouse.model.*;
 import ru.romanow.heisenbug.warehouse.repository.ItemsRepository;
 import ru.romanow.heisenbug.warehouse.repository.OrderItemsRepository;
 
@@ -49,12 +47,17 @@ public class WarehouseServiceImpl
     @Nonnull
     @Override
     @Transactional(readOnly = true)
-    public List<ItemsFullInfoResponse> items(@Nonnull Integer page, @Nonnull Integer size) {
+    public PageableItemsResponse items(@Nonnull Integer page, @Nonnull Integer size) {
         final Pageable pageable = size > 0 ? of(page, size) : unpaged();
-        return itemsRepository.findAll(pageable)
-                .stream()
-                .map(this::buildItemsFullInfoResponse)
-                .collect(toList());
+        final Page<Items> items = itemsRepository.findAll(pageable);
+        return new PageableItemsResponse()
+                .setPage(page)
+                .setPageSize(size)
+                .setTotalSize((int) items.getTotalElements())
+                .setItems(items.getContent()
+                        .stream()
+                        .map(this::buildItemsFullInfoResponse)
+                        .collect(toList()));
     }
 
     @Nonnull

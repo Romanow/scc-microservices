@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.romanow.heisenbug.warehouse.domain.OrderItems;
 import ru.romanow.heisenbug.warehouse.model.ItemsFullInfoResponse;
 import ru.romanow.heisenbug.warehouse.model.OrderItemResponse;
+import ru.romanow.heisenbug.warehouse.model.PageableItemsResponse;
 import ru.romanow.heisenbug.warehouse.model.TakeItemsRequest;
 
 import javax.annotation.Nonnull;
@@ -16,7 +17,7 @@ public interface WarehouseService {
     OrderItems getOrderByUid(@Nonnull UUID orderUid);
 
     @Nonnull
-    List<ItemsFullInfoResponse> items(@Nonnull Integer page, @Nonnull Integer size);
+    PageableItemsResponse items(@Nonnull Integer page, @Nonnull Integer size);
 
     @Nonnull
     OrderItemResponse orderItemState(@Nonnull UUID orderUid);

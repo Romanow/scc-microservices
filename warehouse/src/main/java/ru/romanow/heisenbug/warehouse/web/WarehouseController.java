@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.romanow.heisenbug.warehouse.model.ItemsFullInfoResponse;
 import ru.romanow.heisenbug.warehouse.model.OrderItemResponse;
+import ru.romanow.heisenbug.warehouse.model.PageableItemsResponse;
 import ru.romanow.heisenbug.warehouse.model.TakeItemsRequest;
 import ru.romanow.heisenbug.warehouse.service.WarehouseService;
 
 import javax.validation.Valid;
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +23,7 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public List<ItemsFullInfoResponse> items(
+    public PageableItemsResponse items(
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "0") Integer size) {
         return warehouseService.items(page, size);
