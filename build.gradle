@@ -40,7 +40,7 @@ configure(subprojects) { project ->
 
         // Utils
         compileOnly "com.google.code.findbugs:jsr305:${findBugsVersion}"
-        compile "org.projectlombok:lombok:${lombokVersion}"
+        implementation "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
         // Test
