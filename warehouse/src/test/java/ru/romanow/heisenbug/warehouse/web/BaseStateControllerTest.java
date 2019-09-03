@@ -15,7 +15,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static ru.romanow.heisenbug.warehouse.web.TestHelper.buildOrderItemResponse;
 
-public class BaseCheckoutControllerTest
+public class BaseStateControllerTest
         extends BaseWebTest {
     private static final UUID ORDER_UID = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
     private static final int ITEMS_SIZE = 2;
@@ -28,12 +28,13 @@ public class BaseCheckoutControllerTest
 
     @BeforeEach
     public void init() {
-        when(warehouseService.checkout(any(UUID.class))).thenAnswer((i) -> {
+        when(warehouseService.orderItemState(any(UUID.class))).thenAnswer((i) -> {
             final UUID orderUid = i.getArgument(0);
             throw new EntityNotFoundException(format("OrderItem '%s' not found", orderUid));
         });
-        when(warehouseService.checkout(eq(ORDER_UID)))
-                .thenReturn(buildOrderItemResponse(ORDER_UID, OrderState.READY_FOR_DELIVERY, ITEMS_SIZE));
+
+        when(warehouseService.orderItemState(eq(ORDER_UID)))
+                .thenReturn(buildOrderItemResponse(ORDER_UID, OrderState.CREATED, ITEMS_SIZE));
     }
 
     @Override

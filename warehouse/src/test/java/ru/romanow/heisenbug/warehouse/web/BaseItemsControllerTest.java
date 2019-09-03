@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 public class BaseItemsControllerTest
         extends BaseWebTest {
-    private static final int LIST_SIZE = 10;
+    private static final int LIST_SIZE = 6;
     private static final List<ItemsFullInfoResponse> ITEMS =
             range(0, LIST_SIZE)
                     .mapToObj(BaseItemsControllerTest::buildItem)
@@ -34,6 +34,9 @@ public class BaseItemsControllerTest
         when(warehouseService.items(anyInt(), anyInt())).thenAnswer((i) -> {
             int page = i.getArgument(0);
             int size = i.getArgument(1);
+            if (size == 0) {
+                size = ITEMS.size();
+            }
             return buildItemsResponse(page, size);
         });
     }
@@ -44,7 +47,7 @@ public class BaseItemsControllerTest
     }
 
     private PageableItemsResponse buildItemsResponse(int page, int size) {
-        final List<ItemsFullInfoResponse> items = ITEMS.subList(size * (page - 1), size * page);
+        final List<ItemsFullInfoResponse> items = ITEMS.subList(size * page, size * (page + 1));
         return new PageableItemsResponse()
                 .setPage(page)
                 .setPageSize(size)

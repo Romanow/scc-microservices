@@ -1,4 +1,4 @@
-package checkout
+package state
 
 import org.springframework.cloud.contract.spec.Contract
 import static java.util.UUID.randomUUID
@@ -6,17 +6,10 @@ import static java.util.UUID.randomUUID
 final UUID uid = randomUUID()
 
 Contract.make({
-    description('''
-given:
-    created OrderItems
-when:
-    request checkout
-then:
-    OrderItem not found
-    ''')
+    description 'Return '
     request {
-        method POST()
-        urlPath("/api/v1/items/${uid}/checkout")
+        method GET()
+        urlPath("/api/v1/items/${uid}/state")
         headers {
             contentType(applicationJsonUtf8())
         }

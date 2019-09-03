@@ -3,17 +3,13 @@ package ru.romanow.heisenbug.warehouse.web;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.romanow.heisenbug.warehouse.model.ItemsFullInfoResponse;
 import ru.romanow.heisenbug.warehouse.model.OrderItemResponse;
 import ru.romanow.heisenbug.warehouse.model.PageableItemsResponse;
 import ru.romanow.heisenbug.warehouse.model.TakeItemsRequest;
 import ru.romanow.heisenbug.warehouse.service.WarehouseService;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
-import java.util.List;
 import java.util.UUID;
 
 @RestController

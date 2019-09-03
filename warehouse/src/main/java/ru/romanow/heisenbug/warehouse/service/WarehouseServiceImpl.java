@@ -11,6 +11,7 @@ import ru.romanow.heisenbug.warehouse.domain.Items;
 import ru.romanow.heisenbug.warehouse.domain.OrderItems;
 import ru.romanow.heisenbug.warehouse.domain.enums.OrderState;
 import ru.romanow.heisenbug.warehouse.exceptions.EntityAvailableException;
+import ru.romanow.heisenbug.warehouse.exceptions.OrderItemAlreadyExistsException;
 import ru.romanow.heisenbug.warehouse.model.*;
 import ru.romanow.heisenbug.warehouse.repository.ItemsRepository;
 import ru.romanow.heisenbug.warehouse.repository.OrderItemsRepository;
@@ -72,10 +73,15 @@ public class WarehouseServiceImpl
     @Override
     @Transactional
     public OrderItemResponse takeItems(@Nonnull UUID orderUid, @Nonnull TakeItemsRequest request) {
-        final List<UUID> itemsUid = request.getItemsUid();
-        final List<Items> items = itemsRepository.findByUids(itemsUid);
-        if (items.size() != itemsUid.size()) {
-            throw new EntityNotFoundException(format("Not all items [%s] found", on(",").join(itemsUid)));
+        if (orderItemsRepository.findByOrderUid(orderUid).isPresent()) {
+            throw new OrderItemAlreadyExistsException(format("OrderItem '%s' already exists", orderUid));
+        }
+
+
+        final List<UUID> itemUids = request.getItemsUid();
+        final List<Items> items = itemsRepository.findByUids(itemUids);
+        if (items.size() != itemUids.size()) {
+            throw new EntityNotFoundException(format("Not all items [%s] found", on(",").join(itemUids)));
         }
 
         final List<Items> absentItems = items.stream().filter(item -> item.getCount() == 0).collect(toUnmodifiableList());

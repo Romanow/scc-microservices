@@ -1,14 +1,19 @@
-package checkout
+package takeItem
 
 import org.springframework.cloud.contract.spec.Contract
 
 final UUID orderUid = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52")
+final UUID itemUid1 = UUID.randomUUID();
+final UUID itemUid2 = UUID.randomUUID();
 
 Contract.make({
-    description 'Checkout OrderItem (change state to READY_FOR_DELIVERY)'
+    description 'Take items (create OrderItem and decrement available items count)'
     request {
         method POST()
-        url "/api/v1/items/${orderUid}/checkout"
+        url "/api/v1/items/take"
+        body {
+            itemsUid: [itemUid1, itemUid2]
+        }
         headers {
             contentType(applicationJsonUtf8())
         }
