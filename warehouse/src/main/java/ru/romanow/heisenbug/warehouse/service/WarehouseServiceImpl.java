@@ -63,7 +63,7 @@ public class WarehouseServiceImpl
     @Nonnull
     @Override
     @Transactional(readOnly = true)
-    public OrderItemResponse orderItemState(@Nonnull UUID orderUid) throws EntityNotFoundException {
+    public OrderItemResponse orderItemState(@Nonnull UUID orderUid) {
         final OrderItems orderItems = getOrderByUid(orderUid);
         return buildOrderItemsResponse(orderItems);
     }

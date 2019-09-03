@@ -12,30 +12,19 @@ given:
 when:
     request checkout
 then:
-    successful checkout
+    OrderItem not found
     ''')
     request {
-        method GET()
+        method POST()
         urlPath("/api/v1/items/${uid}/checkout")
         headers {
             contentType(applicationJsonUtf8())
         }
     }
     response {
-        status OK()
+        status NOT_FOUND()
         body(
-                orderUid: $(uid),
-                state: 'READY_FOR_DELIVERY',
-                items: [
-                        [
-                                uid: $(anyUuid()),
-                                name: $(regex('\\S{10}'))
-                        ],
-                        [
-                                uid: $(anyUuid()),
-                                name: $(regex('\\S{10}'))
-                        ]
-                ]
+                message: "OrderItem '${uid}' not found"
         )
         headers {
             contentType(applicationJsonUtf8())
