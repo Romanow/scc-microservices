@@ -29,7 +29,7 @@ public class OrdersController {
         return orderService.status(orderUid);
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/{orderUid}/process", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public OrderInfoResponse process(@PathVariable UUID orderUid) {
         return orderService.process(orderUid);
     }

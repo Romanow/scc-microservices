@@ -77,7 +77,6 @@ public class WarehouseServiceImpl
             throw new OrderItemAlreadyExistsException(format("OrderItem '%s' already exists", orderUid));
         }
 
-
         final List<UUID> itemUids = request.getItemsUid();
         final List<Items> items = itemsRepository.findByUids(itemUids);
         if (items.size() != itemUids.size()) {

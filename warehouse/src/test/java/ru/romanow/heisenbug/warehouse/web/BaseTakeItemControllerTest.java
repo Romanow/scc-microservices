@@ -43,8 +43,9 @@ public class BaseTakeItemControllerTest
         // 4. success
         when(warehouseService.takeItems(any(UUID.class), any(TakeItemsRequest.class))).thenAnswer((i) -> {
             final UUID orderUid = i.getArgument(0);
-            final List<UUID> itemUids = i.getArgument(1);
-            final List<ItemsShortInfo> items = itemUids
+            final TakeItemsRequest takeItemsRequest = i.getArgument(1);
+            final List<ItemsShortInfo> items = takeItemsRequest
+                    .getItemsUid()
                     .stream()
                     .map(TestHelper::buildItemInfo)
                     .collect(toList());
@@ -55,13 +56,13 @@ public class BaseTakeItemControllerTest
                 .thenThrow(new OrderItemAlreadyExistsException(format("OrderItem '%s' already exists", ORDER_UID_ALREADY_EXISTS)));
 
         when(warehouseService.takeItems(eq(ORDER_UID_NOT_FOUND), any(TakeItemsRequest.class))).thenAnswer((i) -> {
-            final List<UUID> itemUids = i.getArgument(1);
-            throw new EntityNotFoundException(format("Not all items [%s] found", on(",").join(itemUids)));
+            final TakeItemsRequest takeItemsRequest = i.getArgument(1);
+            throw new EntityNotFoundException(format("Not all items [%s] found", on(",").join(takeItemsRequest.getItemsUid())));
         });
 
         when(warehouseService.takeItems(eq(ORDER_UID_NOT_AVAILABLE), any(TakeItemsRequest.class))).thenAnswer((i) -> {
-            final List<UUID> itemUids = i.getArgument(1);
-            throw new EntityAvailableException(format("Items [%s] is empty (available count = 0)", on(",").join(itemUids)));
+            final TakeItemsRequest takeItemsRequest = i.getArgument(1);
+            throw new EntityAvailableException(format("Items [%s] is empty (available count = 0)", on(",").join(takeItemsRequest.getItemsUid())));
         });
     }
 
