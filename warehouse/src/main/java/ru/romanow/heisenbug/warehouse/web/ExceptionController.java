@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.romanow.heisenbug.warehouse.exceptions.EntityAvailableException;
+import ru.romanow.heisenbug.warehouse.exceptions.OrderItemAlreadyExistsException;
 import ru.romanow.heisenbug.warehouse.model.ErrorResponse;
 
 import javax.persistence.EntityNotFoundException;
@@ -19,7 +20,7 @@ public class ExceptionController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public @ResponseBody ErrorResponse handleBadRequest(MethodArgumentNotValidException exception) {
+    public @ResponseBody ErrorResponse badRequest(MethodArgumentNotValidException exception) {
         String validationErrors = prepareValidationErrors(exception.getBindingResult().getFieldErrors());
         if (logger.isDebugEnabled()) {
             logger.debug("Bad Request: {}", validationErrors);
@@ -28,29 +29,29 @@ public class ExceptionController {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(EntityNotFoundException.class)
-    public @ResponseBody ErrorResponse handleException(EntityNotFoundException exception) {
+    @ExceptionHandler({EntityNotFoundException.class, EntityAvailableException.class})
+    public @ResponseBody ErrorResponse notFound(Exception exception) {
         logger.warn(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(EntityAvailableException.class)
-    public @ResponseBody ErrorResponse conflict(EntityAvailableException exception) {
+    @ExceptionHandler(OrderItemAlreadyExistsException.class)
+    public @ResponseBody ErrorResponse conflict(OrderItemAlreadyExistsException exception) {
         logger.warn(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public @ResponseBody ErrorResponse handleException(Exception exception) {
+    public @ResponseBody ErrorResponse error(Exception exception) {
         logger.error("", exception);
         return new ErrorResponse(exception.getMessage());
     }
 
     private String prepareValidationErrors(List<FieldError> errors) {
         return errors.stream()
-                     .map(err -> "Field " + err.getField() + " has wrong value: [" + err.getDefaultMessage() + "]")
-                     .collect(Collectors.joining(";"));
+                .map(err -> "Field " + err.getField() + " has wrong value: [" + err.getDefaultMessage() + "]")
+                .collect(Collectors.joining(";"));
     }
 }
