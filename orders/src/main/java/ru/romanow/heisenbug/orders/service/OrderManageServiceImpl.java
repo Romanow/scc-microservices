@@ -42,8 +42,8 @@ public class OrderManageServiceImpl
         final TakeItemsRequest takeItemRequest = new TakeItemsRequest(request.getItemUids());
         final String url = format("%s%s%s", WAREHOUSE_URL, orderUid, TAKE_PATH);
         try {
-            final URI location = restTemplate.postForLocation(url, takeItemRequest);
-            logger.debug("Reserve items on warehouse, order number '{}'", location);
+            final OrderItemResponse response = restTemplate.postForObject(url, takeItemRequest, OrderItemResponse.class);
+            logger.debug("Reserve items on warehouse '{}'", response);
         } catch (RestClientResponseException exception) {
             final String message = format("Error request to '%s': %d:%s", url, exception.getRawStatusCode(), exception.getResponseBodyAsString());
             throw new RestRequestException(message);
