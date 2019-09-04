@@ -25,6 +25,16 @@ contracts {
     }
     basePackageForTests = "ru.romanow.heisenbug.warehouse.web"
     testFramework = "JUNIT5"
+
+    contractDependency {
+        stringNotation = "${project.group}:${project.name}:${project.version}"
+    }
+
+    contractRepository {
+        repositoryUrl = "git://git@gitlab.com:heisenbug-conf/heisenbug-contracts.git"
+    }
+
+    contractsMode = "REMOTE"
 }
 
 dependencies {
