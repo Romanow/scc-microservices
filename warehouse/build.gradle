@@ -1,6 +1,10 @@
-plugins {
-    id "org.springframework.cloud.contract" version "2.1.2.RELEASE"
-    id "org.asciidoctor.gradle.asciidoctor" version  "1.5.1"
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.cloud:spring-cloud-contract-gradle-plugin:${contractVerifierVersion}"
+    }
 }
 
 apply plugin: "org.springframework.boot"
@@ -26,15 +30,17 @@ contracts {
     basePackageForTests = "ru.romanow.heisenbug.warehouse.web"
     testFramework = "JUNIT5"
 
-//    contractDependency {
-//        stringNotation = "${project.group}:${project.name}:${project.version}"
-//    }
-//
-//    contractRepository {
-//        repositoryUrl = "git://git@gitlab.com:heisenbug-conf/heisenbug-contracts.git"
-//    }
-//
-//    contractsMode = "REMOTE"
+    contractDependency {
+        stringNotation = "${project.group}:${project.name}:${project.version}"
+    }
+
+    contractRepository {
+        repositoryUrl = "git://https://wGUMjtoGkLxGkFS5WcMR@gitlab.com/heisenbug-conf/heisenbug-contracts.git"
+        username = "wGUMjtoGkLxGkFS5WcMR"
+        password = ""
+    }
+
+    contractsMode = "REMOTE"
 }
 
 dependencies {

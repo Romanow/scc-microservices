@@ -1,5 +1,5 @@
 ext {
-    springContractVersion = "2.1.2.RELEASE"
+    springContractVersion = "2.1.0.RELEASE"
 
     gsonVersion = "2.8.5"
     guavaVersion = "20.0"

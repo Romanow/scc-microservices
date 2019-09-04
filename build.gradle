@@ -1,6 +1,11 @@
-plugins {
-    id "org.springframework.boot" version "2.1.7.RELEASE"
-    id "io.spring.dependency-management" version "1.0.8.RELEASE"
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}"
+    }
 }
 
 configure(subprojects) { project ->
