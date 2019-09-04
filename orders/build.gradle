@@ -3,3 +3,7 @@ apply plugin: 'org.springframework.boot'
 bootJar {
     archiveFileName = "orders.jar"
 }
+
+dependencies {
+    testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:${springContractVersion}"
+}

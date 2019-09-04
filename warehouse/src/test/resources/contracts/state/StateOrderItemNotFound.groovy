@@ -1,15 +1,12 @@
 package state
 
 import org.springframework.cloud.contract.spec.Contract
-import static java.util.UUID.randomUUID
-
-final UUID uid = randomUUID()
 
 Contract.make({
-    description 'Return '
+    description 'OrderItem not found'
     request {
         method GET()
-        urlPath("/api/v1/items/${uid}/state")
+        urlPath("/api/v1/items/${anyUuid()}/state")
         headers {
             contentType(applicationJsonUtf8())
         }
@@ -17,7 +14,7 @@ Contract.make({
     response {
         status NOT_FOUND()
         body(
-                message: "OrderItem '${uid}' not found"
+                message: "OrderItem '" + $(fromRequest().path(3)).clientValue + "' not found"
         )
         headers {
             contentType(applicationJsonUtf8())

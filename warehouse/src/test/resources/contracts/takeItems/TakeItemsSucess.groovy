@@ -2,9 +2,7 @@ package takeItems
 
 import org.springframework.cloud.contract.spec.Contract
 
-final UUID orderUid = UUID.randomUUID()
-final UUID itemUid1 = UUID.randomUUID()
-final UUID itemUid2 = UUID.randomUUID()
+final UUID orderUid = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52")
 
 Contract.make({
     description 'Take items (create OrderItem and decrement available items count)'
@@ -12,7 +10,7 @@ Contract.make({
         method POST()
         url "/api/v1/items/${orderUid}/take"
         body(
-            itemsUid: [itemUid1, itemUid2]
+            itemsUid: [$(anyUuid()), $(anyUuid())]
         )
         headers {
             contentType(applicationJsonUtf8())
@@ -21,15 +19,15 @@ Contract.make({
     response {
         status CREATED()
         body(
-                orderUid: $(orderUid),
+                orderUid: orderUid,
                 state: 'CREATED',
                 items: [
                         [
-                                itemUid: $(itemUid1),
+                                itemUid: $(fromRequest().body('$.itemsUid[0]')),
                                 name   : $(regex('\\S{10}'))
                         ],
                         [
-                                itemUid: $(itemUid2),
+                                itemUid: $(fromRequest().body('$.itemsUid[1]')),
                                 name   : $(regex('\\S{10}'))
                         ]
                 ]

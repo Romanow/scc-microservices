@@ -3,8 +3,6 @@ package takeItems
 import org.springframework.cloud.contract.spec.Contract
 
 final UUID orderUid = UUID.fromString("36856fc6-d6ec-47cb-bbee-d20e78299eb9")
-final UUID itemUid1 = UUID.randomUUID()
-final UUID itemUid2 = UUID.randomUUID()
 
 Contract.make({
     description 'Requested items not found'
@@ -12,7 +10,7 @@ Contract.make({
         method POST()
         url "/api/v1/items/${orderUid}/take"
         body(
-            itemsUid: [itemUid1, itemUid2]
+                itemsUid: [$(anyUuid()), $(anyUuid())]
         )
         headers {
             contentType(applicationJsonUtf8())
@@ -21,7 +19,9 @@ Contract.make({
     response {
         status NOT_FOUND()
         body(
-                message: 'Not all items [' + itemUid1 + ',' + itemUid2 + '] found'
+                message: 'Not all items [' +
+                        $(fromRequest().body('$.itemsUid[0]')).clientValue + ',' +
+                        $(fromRequest().body('$.itemsUid[1]')).clientValue + '] found'
         )
         headers {
             contentType(applicationJsonUtf8())

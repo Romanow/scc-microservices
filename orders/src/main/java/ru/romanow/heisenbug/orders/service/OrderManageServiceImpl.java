@@ -13,7 +13,6 @@ import ru.romanow.heisenbug.orders.model.OrderRequest;
 import ru.romanow.heisenbug.orders.model.TakeItemsRequest;
 
 import javax.annotation.Nonnull;
-import java.net.URI;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -34,11 +33,12 @@ public class OrderManageServiceImpl
 
     private final RestTemplate restTemplate;
     private final OrderService orderService;
+    private final UUIDGenerator uuidGenerator;
 
     @Nonnull
     @Override
     public UUID makeOrder(@Nonnull OrderRequest request) {
-        final UUID orderUid = UUID.randomUUID();
+        final UUID orderUid = uuidGenerator.generate();
         final TakeItemsRequest takeItemRequest = new TakeItemsRequest(request.getItemUids());
         final String url = format("%s%s%s", WAREHOUSE_URL, orderUid, TAKE_PATH);
         try {

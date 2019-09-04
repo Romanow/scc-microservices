@@ -1,15 +1,12 @@
 package checkout
 
 import org.springframework.cloud.contract.spec.Contract
-import static java.util.UUID.randomUUID
-
-final UUID uid = randomUUID()
 
 Contract.make({
     description 'OrderItem not found'
     request {
         method POST()
-        url "/api/v1/items/${uid}/checkout"
+        url "/api/v1/items/${anyUuid()}/checkout"
         headers {
             contentType(applicationJsonUtf8())
         }
@@ -17,7 +14,7 @@ Contract.make({
     response {
         status NOT_FOUND()
         body(
-                message: "OrderItem '${uid}' not found"
+                message: "OrderItem '" + $(fromRequest().path(3)).clientValue + "' not found"
         )
         headers {
             contentType(applicationJsonUtf8())

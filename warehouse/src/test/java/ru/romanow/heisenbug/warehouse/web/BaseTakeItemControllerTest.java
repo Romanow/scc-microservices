@@ -25,7 +25,7 @@ import static ru.romanow.heisenbug.warehouse.web.TestHelper.buildOrderItemRespon
 
 public class BaseTakeItemControllerTest
         extends BaseWebTest {
-    private static final UUID ORDER_UID_ALREADY_EXISTS = fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
+    private static final UUID ORDER_UID_SUCCESS = fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
     private static final UUID ORDER_UID_NOT_FOUND = fromString("36856fc6-d6ec-47cb-bbee-d20e78299eb9");
     private static final UUID ORDER_UID_NOT_AVAILABLE = fromString("37bb4049-1d1e-449f-8ada-5422f8886231");
 
@@ -43,17 +43,18 @@ public class BaseTakeItemControllerTest
         // 4. success
         when(warehouseService.takeItems(any(UUID.class), any(TakeItemsRequest.class))).thenAnswer((i) -> {
             final UUID orderUid = i.getArgument(0);
+            throw new OrderItemAlreadyExistsException(format("OrderItem '%s' already exists", orderUid));
+        });
+
+        when(warehouseService.takeItems(eq(ORDER_UID_SUCCESS), any(TakeItemsRequest.class))).thenAnswer((i) -> {
             final TakeItemsRequest takeItemsRequest = i.getArgument(1);
             final List<ItemsShortInfo> items = takeItemsRequest
                     .getItemsUid()
                     .stream()
                     .map(TestHelper::buildItemInfo)
                     .collect(toList());
-            return buildOrderItemResponse(orderUid, OrderState.CREATED, items);
+            return buildOrderItemResponse(ORDER_UID_SUCCESS, OrderState.CREATED, items);
         });
-
-        when(warehouseService.takeItems(eq(ORDER_UID_ALREADY_EXISTS), any(TakeItemsRequest.class)))
-                .thenThrow(new OrderItemAlreadyExistsException(format("OrderItem '%s' already exists", ORDER_UID_ALREADY_EXISTS)));
 
         when(warehouseService.takeItems(eq(ORDER_UID_NOT_FOUND), any(TakeItemsRequest.class))).thenAnswer((i) -> {
             final TakeItemsRequest takeItemsRequest = i.getArgument(1);

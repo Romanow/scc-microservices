@@ -5,7 +5,7 @@ import org.springframework.cloud.contract.spec.Contract
 final UUID orderUid = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52")
 
 Contract.make({
-    description ''
+    description 'Return OrderItem info'
     request {
         method GET()
         url "/api/v1/items/${orderUid}/state"
