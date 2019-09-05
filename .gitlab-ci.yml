@@ -17,7 +17,6 @@ build:
     paths:
       - .gradle
   script:
-    - ssh-add ~/.ssh/id_rsa
     - gradle clean build
 
 publish:
