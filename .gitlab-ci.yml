@@ -5,4 +5,4 @@ build:
     paths:
     - .gradle
   script:
-  - gradle clean build
+  - gradle clean build publishStubsToScm
