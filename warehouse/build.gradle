@@ -35,9 +35,7 @@ contracts {
     }
 
     contractRepository {
-        repositoryUrl = "git://https://gitlab.com/heisenbug-conf/heisenbug-contracts.git"
-        username = System.getenv("GITLAB_USERNAME")
-        password = System.getenv("GITLAB_PASSWORD")
+        repositoryUrl = "git://git@gitlab.com:heisenbug-conf/heisenbug-contracts.git"
     }
 
     contractsMode = "REMOTE"
