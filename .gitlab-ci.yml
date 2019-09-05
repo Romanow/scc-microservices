@@ -1,8 +1,26 @@
+image: gradle:jdk11
+
+stages:
+  - build
+  - publish
+
 build:
   stage: build
-  image: gradle:jdk11
   cache:
     paths:
-    - .gradle
+      - .gradle
   script:
-  - gradle clean build publishStubsToScm
+    - gradle clean build publishStubsToScm
+
+publish:
+  stage: publish
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - gradle publishStubsToScm
+  only:
+    - master
