@@ -24,6 +24,10 @@ configure(subprojects) { project ->
         }
     }
 
+    test {
+        useJUnitPlatform()
+    }
+
     repositories {
         mavenCentral()
     }

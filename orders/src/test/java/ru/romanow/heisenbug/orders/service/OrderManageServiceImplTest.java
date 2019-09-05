@@ -6,35 +6,41 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.contract.stubrunner.junit.StubRunnerExtension;
-import org.springframework.cloud.contract.stubrunner.junit.StubRunnerRule;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.romanow.heisenbug.orders.OrdersTestConfiguration;
+import ru.romanow.heisenbug.orders.domain.Orders;
+import ru.romanow.heisenbug.orders.exceptions.RestRequestException;
+import ru.romanow.heisenbug.orders.model.OrderInfoResponse;
 import ru.romanow.heisenbug.orders.model.OrderRequest;
-import ru.romanow.heisenbug.orders.repository.OrdersRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
 
+import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
+import static java.util.UUID.fromString;
+import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @Disabled
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = OrdersTestConfiguration.class)
 @AutoConfigureStubRunner(
-        ids = "ru.romanow.heisenbug:warehouse:1.0.0:8070",
+        ids = "ru.romanow.heisenbug:warehouse:1.0.1:8070",
         repositoryRoot = "git://https://gitlab.com/heisenbug-conf/heisenbug-contracts",
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
 class OrderManageServiceImplTest {
-    private static final UUID ORDER_UID = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
+    private static final UUID ORDER_UID_SUCCESS = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
+    private static final UUID ORDER_UID_NOT_FOUND = fromString("36856fc6-d6ec-47cb-bbee-d20e78299eb9");
+    private static final UUID ORDER_UID_NOT_AVAILABLE = fromString("37bb4049-1d1e-449f-8ada-5422f8886231");
 
     @MockBean
     private OrderService orderService;
@@ -46,25 +52,96 @@ class OrderManageServiceImplTest {
     private OrderManageService orderManageService;
 
     @Test
-    void makeOrder() {
-        when(uuidGenerator.generate()).thenReturn(ORDER_UID);
+    void makeOrderSuccess() {
+        when(uuidGenerator.generate()).thenReturn(ORDER_UID_SUCCESS);
 
-        final List<UUID> items = newArrayList(UUID.randomUUID(), UUID.randomUUID());
+        final List<UUID> items = newArrayList(randomUUID(), randomUUID());
         final OrderRequest request =
                 new OrderRequest()
                         .setAddress(randomAlphanumeric(10))
                         .setFirstName(randomAlphabetic(10))
                         .setLastName(randomAlphabetic(10))
                         .setItemUids(items);
-//        final UUID orderUid = orderManageService.makeOrder(request);
+        final UUID orderUid = orderManageService.makeOrder(request);
 
-//        assertEquals(ORDER_UID, orderUid);
+        assertEquals(ORDER_UID_SUCCESS, orderUid);
+        verify(orderService, times(1)).createOrder(eq(orderUid), eq(request));
     }
-//
-//    @Test
-//    void status() {
-//    }
-//
+
+    @Test
+    void makeOrderAlreadyExists() {
+        final UUID generatedOrderUid = randomUUID();
+        when(uuidGenerator.generate()).thenReturn(generatedOrderUid);
+
+        final List<UUID> items = newArrayList(randomUUID(), randomUUID());
+        final OrderRequest request =
+                new OrderRequest()
+                        .setAddress(randomAlphanumeric(10))
+                        .setFirstName(randomAlphabetic(10))
+                        .setLastName(randomAlphabetic(10))
+                        .setItemUids(items);
+
+        assertThrows(RestRequestException.class, () -> orderManageService.makeOrder(request));
+    }
+
+    @Test
+    void makeOrderItemsNotAvailable() {
+        when(uuidGenerator.generate()).thenReturn(ORDER_UID_NOT_AVAILABLE);
+
+        final List<UUID> items = newArrayList(randomUUID(), randomUUID());
+        final OrderRequest request =
+                new OrderRequest()
+                        .setAddress(randomAlphanumeric(10))
+                        .setFirstName(randomAlphabetic(10))
+                        .setLastName(randomAlphabetic(10))
+                        .setItemUids(items);
+
+        assertThrows(RestRequestException.class, () -> orderManageService.makeOrder(request));
+    }
+
+    @Test
+    void makeOrderItemsNotFound() {
+        when(uuidGenerator.generate()).thenReturn(ORDER_UID_NOT_FOUND);
+
+        final List<UUID> items = newArrayList(randomUUID(), randomUUID());
+        final OrderRequest request =
+                new OrderRequest()
+                        .setAddress(randomAlphanumeric(10))
+                        .setFirstName(randomAlphabetic(10))
+                        .setLastName(randomAlphabetic(10))
+                        .setItemUids(items);
+
+        assertThrows(RestRequestException.class, () -> orderManageService.makeOrder(request));
+    }
+
+    @Test
+    void statusSuccess() {
+        final UUID orderUid = randomUUID();
+        final List<UUID> itemUids = newArrayList(randomUUID(), randomUUID());
+        when(orderService.getOrderByUid(orderUid)).thenReturn(buildOrder(orderUid, itemUids));
+        final OrderInfoResponse status = orderManageService.status(orderUid);
+
+        assertEquals(orderUid, status.getOrderUid());
+    }
+
+    private Orders buildOrder(UUID orderUid, List<UUID> itemUids) {
+        return new Orders()
+                .setUid(orderUid)
+                .setFirstName(randomAlphabetic(10))
+                .setLastName(randomAlphabetic(10))
+                .setAddress(randomAlphanumeric(20))
+                .setItems(on(",").join(itemUids));
+    }
+
+    @Test
+    void statusOrderNotFound() {
+        final UUID orderUid = randomUUID();
+        when(orderService.getOrderByUid(orderUid))
+                .thenThrow(new EntityNotFoundException(format("Order '%s' not found", orderUid)));
+
+        assertThrows(EntityNotFoundException.class, () -> orderManageService.status(orderUid));
+    }
+
 //    @Test
 //    void process() {
 //    }
