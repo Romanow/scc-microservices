@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = OrdersTestConfiguration.class)
 @AutoConfigureStubRunner(
-        ids = "ru.romanow.heisenbug:warehouse:1.0.1:8070",
+        ids = "ru.romanow.heisenbug:warehouse:1.0.2:8070",
         repositoryRoot = "git://https://gitlab.com/heisenbug-conf/heisenbug-contracts",
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
 class OrderManageServiceImplTest {
@@ -116,21 +116,11 @@ class OrderManageServiceImplTest {
 
     @Test
     void statusSuccess() {
-        final UUID orderUid = randomUUID();
         final List<UUID> itemUids = newArrayList(randomUUID(), randomUUID());
-        when(orderService.getOrderByUid(orderUid)).thenReturn(buildOrder(orderUid, itemUids));
-        final OrderInfoResponse status = orderManageService.status(orderUid);
+        when(orderService.getOrderByUid(ORDER_UID_SUCCESS)).thenReturn(buildOrder(ORDER_UID_SUCCESS, itemUids));
+        final OrderInfoResponse status = orderManageService.status(ORDER_UID_SUCCESS);
 
-        assertEquals(orderUid, status.getOrderUid());
-    }
-
-    private Orders buildOrder(UUID orderUid, List<UUID> itemUids) {
-        return new Orders()
-                .setUid(orderUid)
-                .setFirstName(randomAlphabetic(10))
-                .setLastName(randomAlphabetic(10))
-                .setAddress(randomAlphanumeric(20))
-                .setItems(on(",").join(itemUids));
+        assertEquals(ORDER_UID_SUCCESS  , status.getOrderUid());
     }
 
     @Test
@@ -142,7 +132,18 @@ class OrderManageServiceImplTest {
         assertThrows(EntityNotFoundException.class, () -> orderManageService.status(orderUid));
     }
 
-//    @Test
-//    void process() {
-//    }
+    @Test
+    void processOrderNotFound() {
+        final UUID orderUid = randomUUID();
+        assertThrows(EntityNotFoundException.class, () -> orderManageService.process(orderUid));
+    }
+
+    private Orders buildOrder(UUID orderUid, List<UUID> itemUids) {
+        return new Orders()
+                .setUid(orderUid)
+                .setFirstName(randomAlphabetic(10))
+                .setLastName(randomAlphabetic(10))
+                .setAddress(randomAlphanumeric(20))
+                .setItems(on(",").join(itemUids));
+    }
 }

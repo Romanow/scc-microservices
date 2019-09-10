@@ -11,7 +11,7 @@ apply plugin: "org.springframework.boot"
 apply plugin: "spring-cloud-contract"
 apply plugin: "maven-publish"
 
-ext.version = '1.0.1'
+def contractVersion = '1.0.2'
 
 publishing {
     publications {
@@ -35,7 +35,7 @@ contracts {
     contractDependency {
         groupId = project.group
         artifactId = project.name
-        version = version
+        version = contractVersion
     }
 
     contractRepository {
