@@ -1,10 +1,19 @@
 package ru.romanow.heisenbug.delivery.model;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
+
+import javax.validation.constraints.NotEmpty;
 
 @Data
+@Accessors(chain = true)
 public class DeliveryRequest {
-    private String firstName;
-    private String lastName;
+
+    @NotEmpty(message = "{field.is.empty")
     private String address;
+
+    @NotEmpty(message = "{field.is.empty")
+    private String firstName;
+
+    private String lastName;
 }

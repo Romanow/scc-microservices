@@ -1,5 +1,90 @@
-apply plugin: 'org.springframework.boot'
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.springframework.cloud:spring-cloud-contract-gradle-plugin:${contractVerifierVersion}"
+        classpath "org.asciidoctor:asciidoctor-gradle-plugin:${asciiDoctorVersion}"
+    }
+}
 
-bootJar {
-    archiveFileName = "delivery.jar"
+apply plugin: "org.springframework.boot"
+apply plugin: "org.asciidoctor.convert"
+//apply plugin: "spring-cloud-contract"
+//apply plugin: "maven-publish"
+//
+//def contractVersion = '1.0.2'
+//
+//publishing {
+//    publications {
+//        stubs(MavenPublication) {
+//            artifactId project.name
+//            artifact verifierStubsJar
+//        }
+//    }
+//}
+//
+//contracts {
+//    baseClassMappings {
+//        baseClassMapping ".*deliver.*", "ru.romanow.heisenbug.warehouse.web.BaseItemsControllerTest"
+//    }
+//    basePackageForTests = "ru.romanow.heisenbug.warehouse.web"
+//    testFramework = "JUNIT5"
+//
+//    contractDependency {
+//        groupId = project.group
+//        artifactId = project.name
+//        version = contractVersion
+//    }
+//
+//    contractRepository {
+//        repositoryUrl = "git://https://gitlab.com/heisenbug-conf/heisenbug-contracts.git"
+//        username = System.getenv("GITLAB_USERNAME")
+//        password = System.getenv("GITLAB_PASSWORD")
+//        cacheDownloadedContracts = false
+//    }
+//
+//    contractsMode = "REMOTE"
+//}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+    htmlOutputDir = file('build/generated-docs')
+}
+
+asciidoctor {
+    dependsOn test
+
+    backends = ['html5']
+    attributes = [
+            'source-highlighter': 'highlightjs',
+            'toc'               : 'left',
+            'toclevels'         : 2,
+            'numbered'          : '',
+            'icons'             : 'font',
+            'setanchors'        : '',
+            'idprefix'          : '',
+            'idseparator'       : '-',
+            'docinfo1'          : '',
+            'safe-mode-unsafe'  : '',
+            'allow-uri-read'    : '',
+            'snippets'          : snippetsDir,
+            linkattrs           : true,
+            encoding            : 'utf-8'
+    ]
+
+    inputs.dir snippetsDir
+    outputDir htmlOutputDir
+    sourceDir 'src/docs/asciidoc'
+}
+
+dependencies {
+    implementation "com.google.code.gson:gson:${gsonVersion}"
+
+    testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc"
+    testImplementation "org.springframework.cloud:spring-cloud-contract-spec:${springContractVersion}"
+    testImplementation "org.springframework.cloud:spring-cloud-contract-wiremock:${springContractVersion}"
+    testImplementation "org.springframework.cloud:spring-cloud-starter-contract-verifier:${springContractVersion}"
+    asciidoctor "org.springframework.restdocs:spring-restdocs-asciidoctor"
 }

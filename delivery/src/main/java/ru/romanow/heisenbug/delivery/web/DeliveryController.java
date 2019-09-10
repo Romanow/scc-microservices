@@ -18,8 +18,7 @@ public class DeliveryController {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping(value = "/{orderUid}/deliver",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public void deliver(@PathVariable UUID orderUid, @Valid @RequestBody DeliveryRequest request) {
         deliveryManageService.deliver(orderUid, request);
     }
