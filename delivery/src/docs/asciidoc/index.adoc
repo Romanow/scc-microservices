@@ -16,4 +16,4 @@ Example response
 include::{snippets}/deliver/http-response.adoc[]
 
 Response fields
-include::{snippets}/deliver/response-fields.adoc[]
+include::{snippets}/deliver/request-fields.adoc[]

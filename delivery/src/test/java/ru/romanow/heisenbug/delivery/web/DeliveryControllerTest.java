@@ -1,5 +1,7 @@
 package ru.romanow.heisenbug.delivery.web;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.romanow.heisenbug.delivery.model.DeliveryRequest;
@@ -16,20 +19,24 @@ import ru.romanow.heisenbug.delivery.service.DeliveryManageService;
 
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.springframework.cloud.contract.wiremock.restdocs.SpringCloudContractRestDocs.dslContract;
+import static org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(DeliveryController.class)
 @AutoConfigureRestDocs
 class DeliveryControllerTest {
+    private static final String UUID_PATTERN = "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}";
 
     @MockBean
     private DeliveryManageService deliveryManageService;
@@ -51,14 +58,26 @@ class DeliveryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(gson.toJson(request)))
                 .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andDo(verify()
+                        .wiremock(WireMock.post(
+                                urlMatching(format("/api/v1/delivery/%s/deliver", UUID_PATTERN)))
+                                .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .jsonPath("$[?(@.message == 'OK')]")
+                        .stub("deliver"))
                 .andDo(document("deliver",
                         requestFields(
                                 fieldWithPath("address").description("Delivery address").type(JsonFieldType.STRING),
                                 fieldWithPath("firstName").description("First name").type(JsonFieldType.STRING),
                                 fieldWithPath("lastName").description("Last name").optional().type(JsonFieldType.STRING)
                         ),
+
+                        responseFields(
+                                fieldWithPath("message").description("Result").type(JsonFieldType.STRING)
+                        ),
                         dslContract())
                 );
-
     }
 }
