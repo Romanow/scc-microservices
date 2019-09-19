@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.romanow.heisenbug.delivery.exceptions.OrderNotReadyException;
 import ru.romanow.heisenbug.delivery.exceptions.RestRequestException;
 import ru.romanow.heisenbug.delivery.model.ErrorResponse;
 
@@ -26,10 +27,15 @@ public class ExceptionController {
         return new ErrorResponse(validationErrors);
     }
 
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ExceptionHandler(OrderNotReadyException.class)
+    public @ResponseBody ErrorResponse notAcceptable(OrderNotReadyException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(RestRequestException.class)
     public @ResponseBody ErrorResponse conflict(RestRequestException exception) {
-        logger.warn(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 

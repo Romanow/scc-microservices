@@ -7,6 +7,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import ru.romanow.heisenbug.delivery.domain.Delivery;
 import ru.romanow.heisenbug.delivery.domain.enums.DeliveryState;
+import ru.romanow.heisenbug.delivery.exceptions.OrderNotReadyException;
 import ru.romanow.heisenbug.delivery.exceptions.RestRequestException;
 import ru.romanow.heisenbug.delivery.model.DeliveryRequest;
 import ru.romanow.heisenbug.delivery.model.OrderItemResponse;
@@ -26,8 +27,8 @@ public class DeliveryManageServiceImpl
         implements DeliveryManageService {
     private static final Logger logger = getLogger(DeliveryManageServiceImpl.class);
 
-    private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
-    private static final String CHECKOUT_PATH = "/checkout";
+    public static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
+    public static final String CHECKOUT_PATH = "/checkout";
 
     private final RestTemplate restTemplate;
     private final DeliveryRepository deliveryRepository;
@@ -36,7 +37,7 @@ public class DeliveryManageServiceImpl
     public void deliver(@Nonnull UUID orderUid, @Nonnull DeliveryRequest request) {
         final OrderItemResponse response = makeWarehouseCheckoutRequest(orderUid);
         if (response.getState() != OrderState.READY_FOR_DELIVERY) {
-            throw new IllegalArgumentException(format("Order '%s' has invalid state", orderUid));
+            throw new OrderNotReadyException(format("Order '%s' has invalid state", orderUid));
         }
 
         Delivery delivery = new Delivery()

@@ -18,15 +18,10 @@ import java.util.UUID;
 public class DeliveryController {
     private final DeliveryManageService deliveryManageService;
 
-    @Data
-    class SimpleResponse {
-        private final String message;
-    }
-
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping(value = "/{orderUid}/deliver",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SimpleResponse> deliver(@PathVariable UUID orderUid, @Valid @RequestBody DeliveryRequest request) {
+    public void deliver(@PathVariable UUID orderUid, @Valid @RequestBody DeliveryRequest request) {
         deliveryManageService.deliver(orderUid, request);
-        return ResponseEntity.accepted().body(new SimpleResponse("OK"));
     }
 }
