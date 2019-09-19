@@ -5,6 +5,10 @@ import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.platform.commons.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,8 +27,11 @@ import ru.romanow.heisenbug.delivery.model.DeliveryRequest;
 import ru.romanow.heisenbug.delivery.model.ErrorResponse;
 import ru.romanow.heisenbug.delivery.service.DeliveryManageService;
 
+import java.lang.reflect.Constructor;
 import java.rmi.server.UID;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
@@ -102,25 +109,38 @@ class DeliveryControllerTest {
         buildErrorRequest("deliverNotReady", ORDER_UID_NOT_READY, message, NOT_ACCEPTABLE.value());
     }
 
-    @Test
+
     void deliverWarehouseError()
             throws Exception {
         final String url = "/items/" + ORDER_UID_WH_ERROR + "/checkout";
         final ErrorResponse errorResponse = new ErrorResponse(format("Order '%s' not found", ORDER_UID_NOT_READY));
         final String message = format("Error request to '%s': %d:%s", url, NOT_FOUND.value(), gson.toJson(errorResponse));
-        doThrow(new RestRequestException(message))
-                .when(deliveryManageService)
-                .deliver(eq(ORDER_UID_WH_ERROR), any(DeliveryRequest.class));
+
 
         buildErrorRequest("deliverRequestError", ORDER_UID_WH_ERROR, message, CONFLICT.value());
     }
 
-    private void buildErrorRequest(String name, UUID orderUid, String message, int status)
+    private static Stream<Arguments> provideErrorRequest() {
+        return Stream.of(
+                Arguments.of(null, true),
+                Arguments.of("", true),
+                Arguments.of("  ", true),
+                Arguments.of("not blank", false)
+                        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideErrorRequest")
+    void buildErrorRequest(String name, Class<? extends RuntimeException> cls, UUID orderUid, String message, int status)
             throws Exception {
         final DeliveryRequest request = new DeliveryRequest()
                 .setAddress(randomAlphanumeric(10))
                 .setFirstName(randomAlphabetic(10))
                 .setLastName(randomAlphabetic(10));
+
+        doThrow(exception)
+                .when(deliveryManageService)
+                .deliver(eq(ORDER_UID_WH_ERROR), eq(request));
 
         mockMvc.perform(post(format("/api/v1/delivery/%s/deliver", orderUid))
                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
