@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,9 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.restdocs.payload.PayloadDocumentation;
-import org.springframework.restdocs.payload.ResponseFieldsSnippet;
-import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.romanow.heisenbug.delivery.exceptions.OrderNotReadyException;
@@ -27,30 +23,28 @@ import ru.romanow.heisenbug.delivery.model.DeliveryRequest;
 import ru.romanow.heisenbug.delivery.model.ErrorResponse;
 import ru.romanow.heisenbug.delivery.service.DeliveryManageService;
 
-import java.lang.reflect.Constructor;
-import java.rmi.server.UID;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.lang.String.format;
 import static java.util.UUID.fromString;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import static org.springframework.cloud.contract.wiremock.restdocs.SpringCloudContractRestDocs.dslContract;
 import static org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs.verify;
+import static org.springframework.data.util.ReflectionUtils.findConstructor;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(DeliveryController.class)
@@ -60,6 +54,7 @@ class DeliveryControllerTest {
     private static final UUID ORDER_UID_NOT_READY = fromString("fc1f6904-6a27-4fa0-ac05-64233d111a23");
     private static final UUID ORDER_UID_WH_ERROR = fromString("b7db3e82-7ade-464f-a336-dd3b91709781");
     private static final String UUID_PATTERN = "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}";
+    private static final String STRING_VALUE = "";
 
     @MockBean
     private DeliveryManageService deliveryManageService;
@@ -67,7 +62,7 @@ class DeliveryControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
     @Test
     void deliverSuccess()
@@ -84,9 +79,9 @@ class DeliveryControllerTest {
                         .wiremock(WireMock.post(
                                 urlMatching(format("/api/v1/delivery/%s/deliver", UUID_PATTERN)))
                                 .withRequestBody(matchingJsonPath("$.firstName", new RegexPattern("\\S{10}")))
-                                          .withRequestBody(matchingJsonPath("$.lastName", new RegexPattern("\\S{10}")))
-                                          .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
-                                 )
+                                .withRequestBody(matchingJsonPath("$.lastName", new RegexPattern("\\S{10}")))
+                                .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
+                        )
                         .stub("deliverSuccess"))
                 .andDo(document("deliverSuccess",
                         requestFields(
@@ -98,71 +93,55 @@ class DeliveryControllerTest {
                 );
     }
 
-    @Test
-    void deliverNotReady()
-            throws Exception {
-        final String message = format("Order '%s' has invalid state", ORDER_UID_WH_ERROR);
-        doThrow(new OrderNotReadyException(message))
-                .when(deliveryManageService)
-                .deliver(eq(ORDER_UID_NOT_READY), any(DeliveryRequest.class));
-
-        buildErrorRequest("deliverNotReady", ORDER_UID_NOT_READY, message, NOT_ACCEPTABLE.value());
-    }
-
-
-    void deliverWarehouseError()
-            throws Exception {
-        final String url = "/items/" + ORDER_UID_WH_ERROR + "/checkout";
-        final ErrorResponse errorResponse = new ErrorResponse(format("Order '%s' not found", ORDER_UID_NOT_READY));
-        final String message = format("Error request to '%s': %d:%s", url, NOT_FOUND.value(), gson.toJson(errorResponse));
-
-
-        buildErrorRequest("deliverRequestError", ORDER_UID_WH_ERROR, message, CONFLICT.value());
-    }
-
-    private static Stream<Arguments> provideErrorRequest() {
-        return Stream.of(
-                Arguments.of(null, true),
-                Arguments.of("", true),
-                Arguments.of("  ", true),
-                Arguments.of("not blank", false)
-                        );
-    }
-
     @ParameterizedTest
     @MethodSource("provideErrorRequest")
-    void buildErrorRequest(String name, Class<? extends RuntimeException> cls, UUID orderUid, String message, int status)
+    <T extends RuntimeException> void testErrorRequest(String name, Class<T> cls, UUID orderUid, String message, HttpStatus httpStatus)
             throws Exception {
         final DeliveryRequest request = new DeliveryRequest()
                 .setAddress(randomAlphanumeric(10))
                 .setFirstName(randomAlphabetic(10))
                 .setLastName(randomAlphabetic(10));
 
+        final T exception = (T) findConstructor(cls, STRING_VALUE).get().newInstance(message);
         doThrow(exception)
                 .when(deliveryManageService)
-                .deliver(eq(ORDER_UID_WH_ERROR), eq(request));
+                .deliver(eq(orderUid), eq(request));
 
         mockMvc.perform(post(format("/api/v1/delivery/%s/deliver", orderUid))
-                                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                                .content(gson.toJson(request)))
-               .andExpect(status().is(status))
-               .andExpect(jsonPath("$.message").value(message))
-               .andDo(verify()
-                              .wiremock(WireMock.post(
-                                      urlMatching(format("/api/v1/delivery/%s/deliver", UUID_PATTERN)))
-                                                .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
-                                       )
-                              .stub(name))
-               .andDo(document(name,
-                               requestFields(
-                                       fieldWithPath("address").description("Delivery address").type(JsonFieldType.STRING),
-                                       fieldWithPath("firstName").description("First name").type(JsonFieldType.STRING),
-                                       fieldWithPath("lastName").description("Last name").optional().type(JsonFieldType.STRING)
-                               ),
-                               responseFields(
-                                       fieldWithPath("message").description("Error description").type(JsonFieldType.STRING)
-                                             ),
-                               dslContract())
-                     );
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(gson.toJson(request)))
+                .andExpect(status().is(httpStatus.value()))
+                .andExpect(jsonPath("$.message").value(message))
+                .andDo(verify()
+                        .wiremock(WireMock.post(
+                                urlMatching(format("/api/v1/delivery/%s/deliver", UUID_PATTERN)))
+                                .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
+                                .withRequestBody(matchingJsonPath("$.firstName", new RegexPattern("\\S{10}")))
+                                .withRequestBody(matchingJsonPath("$.lastName", new RegexPattern("\\S{10}")))
+                        )
+                        .stub(name))
+                .andDo(document(name,
+                        requestFields(
+                                fieldWithPath("address").description("Delivery address").type(JsonFieldType.STRING),
+                                fieldWithPath("firstName").description("First name").type(JsonFieldType.STRING),
+                                fieldWithPath("lastName").description("Last name").optional().type(JsonFieldType.STRING)
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("Error description").type(JsonFieldType.STRING)
+                        ),
+                        dslContract())
+                );
+    }
+
+    private static Stream<Arguments> provideErrorRequest() {
+        final String url = "/items/" + ORDER_UID_WH_ERROR + "/checkout";
+        final ErrorResponse errorResponse = new ErrorResponse(format("Order '%s' not found", ORDER_UID_NOT_READY));
+        final String deliverRequestErrorMessage = format("Error request to '%s': %d:%s", url, NOT_FOUND.value(), gson.toJson(errorResponse));
+        final String deliveryNotReadyMessage = format("Order '%s' has invalid state", ORDER_UID_WH_ERROR);
+
+        return Stream.of(
+                of("deliveryNotReady", OrderNotReadyException.class, ORDER_UID_NOT_READY, deliveryNotReadyMessage, NOT_ACCEPTABLE),
+                of("deliverRequestError", RestRequestException.class, ORDER_UID_WH_ERROR, deliverRequestErrorMessage, CONFLICT)
+        );
     }
 }
