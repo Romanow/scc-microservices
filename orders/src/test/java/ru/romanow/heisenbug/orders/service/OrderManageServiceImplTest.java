@@ -34,7 +34,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = OrdersTestConfiguration.class)
 @AutoConfigureStubRunner(
-        ids = "ru.romanow.heisenbug:warehouse:1.0.2:8070",
+        ids = {
+                "ru.romanow.heisenbug:warehouse:1.0.2:8070",
+                "ru.romanow.heisenbug:delivery:1.0.0:8090"
+        },
         repositoryRoot = "git://https://gitlab.com/heisenbug-conf/heisenbug-contracts",
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
 class OrderManageServiceImplTest {

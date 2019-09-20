@@ -30,6 +30,7 @@ configure(subprojects) { project ->
 
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {

@@ -1,52 +1,38 @@
 buildscript {
     repositories {
-        mavenCentral()
         jcenter()
     }
     dependencies {
         classpath "org.springframework.cloud:spring-cloud-contract-gradle-plugin:${contractVerifierVersion}"
         classpath "org.asciidoctor:asciidoctor-gradle-plugin:${asciiDoctorVersion}"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${bintrayVersion}"
     }
 }
 
 apply plugin: "org.springframework.boot"
 apply plugin: "org.asciidoctor.convert"
-//apply plugin: "spring-cloud-contract"
-//apply plugin: "maven-publish"
-//
-//def contractVersion = '1.0.2'
-//
-//publishing {
-//    publications {
-//        stubs(MavenPublication) {
-//            artifactId project.name
-//            artifact verifierStubsJar
-//        }
-//    }
-//}
-//
-//contracts {
-//    baseClassMappings {
-//        baseClassMapping ".*deliver.*", "ru.romanow.heisenbug.warehouse.web.BaseItemsControllerTest"
-//    }
-//    basePackageForTests = "ru.romanow.heisenbug.warehouse.web"
-//    testFramework = "JUNIT5"
-//
-//    contractDependency {
-//        groupId = project.group
-//        artifactId = project.name
-//        version = contractVersion
-//    }
-//
-//    contractRepository {
-//        repositoryUrl = "git://https://gitlab.com/heisenbug-conf/heisenbug-contracts.git"
-//        username = System.getenv("GITLAB_USERNAME")
-//        password = System.getenv("GITLAB_PASSWORD")
-//        cacheDownloadedContracts = false
-//    }
-//
-//    contractsMode = "REMOTE"
-//}
+apply plugin: "spring-cloud-contract"
+apply plugin: "com.jfrog.bintray"
+apply plugin: "maven-publish"
+
+publishing {
+    publications {
+        stubs(MavenPublication) {
+            artifact verifierStubsJar
+            artifactId project.name
+        }
+    }
+}
+
+bintray {
+    user = 'ronin'
+    key = ''
+    publications = ['stubs']
+    pkg {
+        repo = 'heisenbug-contracts'
+        name = project.name
+    }
+}
 
 ext {
     snippetsDir = file('build/generated-snippets')
