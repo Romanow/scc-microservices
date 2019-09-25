@@ -7,12 +7,10 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import ru.romanow.heisenbug.orders.domain.Orders;
 import ru.romanow.heisenbug.orders.exceptions.RestRequestException;
-import ru.romanow.heisenbug.orders.model.OrderInfoResponse;
-import ru.romanow.heisenbug.orders.model.OrderItemResponse;
-import ru.romanow.heisenbug.orders.model.OrderRequest;
-import ru.romanow.heisenbug.orders.model.TakeItemsRequest;
+import ru.romanow.heisenbug.orders.model.*;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -68,7 +66,7 @@ public class OrderManageServiceImpl
         final Orders order = orderService.getOrderByUid(orderUid);
         final OrderItemResponse orderInfo = makeWarehouseStateRequest(orderUid);
 
-        makeDeliveryRequest(orderUid);
+        makeDeliveryRequest(orderUid, order.getFirstName(), order.getLastName(), order.getAddress());
 
         return buildOrderInfoResponse(order, orderInfo);
     }
@@ -85,10 +83,14 @@ public class OrderManageServiceImpl
         }
     }
 
-    private void makeDeliveryRequest(@Nonnull UUID orderUid) {
+    private void makeDeliveryRequest(@Nonnull UUID orderUid, @Nonnull String firstName, @Nullable String lastName, @Nonnull String address) {
         final String url = format("%s%s%s", DELIVERY_URL, orderUid, DELIVERY_PATH);
         try {
-            restTemplate.getForObject(url, Void.class);
+            final DeliveryRequest deliveryRequest = new DeliveryRequest()
+                    .setFirstName(firstName)
+                    .setLastName(lastName)
+                    .setAddress(address);
+            restTemplate.postForObject(url, deliveryRequest, Void.class);
         } catch (RestClientResponseException exception) {
             final String message = format("Error request to '%s': %d:%s", url, exception.getRawStatusCode(), exception.getResponseBodyAsString());
             throw new RestRequestException(message);

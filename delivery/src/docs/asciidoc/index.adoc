@@ -9,11 +9,16 @@
 
 == Deliver
 
-Request structure
-include::{snippets}/deliver/http-request.adoc[]
+Request for delivery. Goes to WH to inform that orderItems should change status to READY_FOR_DELIVERY.
 
-Example response
-include::{snippets}/deliver/http-response.adoc[]
+Request structure:
+include::{snippets}/deliverySuccess/request-fields.adoc[]
 
-Response fields
-include::{snippets}/deliver/request-fields.adoc[]
+If response is success, return empty response.
+
+Example request:
+include::{snippets}/deliverySuccess/http-request.adoc[]
+include::{snippets}/deliverySuccess/http-response.adoc[]
+
+In case of error return
+include::{snippets}/deliveryNotReady/response-body.adoc[]

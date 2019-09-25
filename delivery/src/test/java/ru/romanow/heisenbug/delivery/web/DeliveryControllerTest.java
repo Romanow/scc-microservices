@@ -83,7 +83,7 @@ class DeliveryControllerTest {
                                 .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
                         )
                         .stub("deliverSuccess"))
-                .andDo(document("deliverSuccess",
+                .andDo(document("deliverySuccess",
                         requestFields(
                                 fieldWithPath("address").description("Delivery address").type(JsonFieldType.STRING),
                                 fieldWithPath("firstName").description("First name").type(JsonFieldType.STRING),
@@ -141,7 +141,7 @@ class DeliveryControllerTest {
 
         return Stream.of(
                 of("deliveryNotReady", OrderNotReadyException.class, ORDER_UID_NOT_READY, deliveryNotReadyMessage, NOT_ACCEPTABLE),
-                of("deliverRequestError", RestRequestException.class, ORDER_UID_WH_ERROR, deliverRequestErrorMessage, CONFLICT)
+                of("deliveryRequestError", RestRequestException.class, ORDER_UID_WH_ERROR, deliverRequestErrorMessage, CONFLICT)
         );
     }
 }
