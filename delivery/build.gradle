@@ -15,10 +15,28 @@ apply plugin: "spring-cloud-contract"
 apply plugin: "com.jfrog.bintray"
 apply plugin: "maven-publish"
 
+task stubsJar(type: Jar) {
+    archiveClassifier = "stubs"
+    into("META-INF/${project.group}/${project.name}/${project.version}/mappings") {
+        include('**/*.*')
+        from("${project.buildDir}/generated-snippets/stubs")
+    }
+    into("META-INF/${project.group}/${project.name}/${project.version}/contracts") {
+        include('**/*.groovy')
+        from("${project.buildDir}/generated-snippets/contracts")
+    }
+}
+
+stubsJar.dependsOn(test)
+
+artifacts {
+    archives stubsJar
+}
+
 publishing {
     publications {
         stubs(MavenPublication) {
-            artifact verifierStubsJar
+            artifact stubsJar
             artifactId project.name
         }
     }
