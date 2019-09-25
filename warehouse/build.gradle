@@ -3,14 +3,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${bintrayVersion}"
         classpath "org.springframework.cloud:spring-cloud-contract-gradle-plugin:${contractVerifierVersion}"
     }
 }
 
 apply plugin: "org.springframework.boot"
 apply plugin: "spring-cloud-contract"
-apply plugin: "com.jfrog.bintray"
 apply plugin: "maven-publish"
 
 publishing {
@@ -24,7 +22,7 @@ publishing {
 
 bintray {
     user = 'ronin'
-    key = ''
+    key = '794b2d060a453ffc0fd1d6f715a59b4a480d4ca7'
     publications = ['stubs']
     pkg {
         repo = 'heisenbug-contracts'

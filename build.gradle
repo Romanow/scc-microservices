@@ -1,8 +1,9 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${bintrayVersion}"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
         classpath "io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}"
     }
@@ -11,6 +12,7 @@ buildscript {
 configure(subprojects) { project ->
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: "com.jfrog.bintray"
     apply plugin: 'io.spring.dependency-management'
     apply from: '../libraries.gradle'
 

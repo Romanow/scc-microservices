@@ -35,10 +35,10 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = OrdersTestConfiguration.class)
 @AutoConfigureStubRunner(
         ids = {
-                "ru.romanow.heisenbug:warehouse:1.0.2:8070",
-                "ru.romanow.heisenbug:delivery:1.0.0:8090"
+                "ru.romanow.heisenbug:warehouse:[1.0.0,2.0.0):8070",
+//                "ru.romanow.heisenbug:delivery:1.0.0:8090"
         },
-        repositoryRoot = "git://https://gitlab.com/heisenbug-conf/heisenbug-contracts",
+        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
 class OrderManageServiceImplTest {
     private static final UUID ORDER_UID_SUCCESS = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
