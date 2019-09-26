@@ -90,6 +90,7 @@ dependencies {
     testImplementation "org.springframework.cloud:spring-cloud-contract-spec:${springContractVersion}"
     testImplementation "org.springframework.cloud:spring-cloud-contract-wiremock:${springContractVersion}"
     testImplementation "org.springframework.cloud:spring-cloud-starter-contract-verifier:${springContractVersion}"
+    testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:${springContractVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     asciidoctor "org.springframework.restdocs:spring-restdocs-asciidoctor"
 }
