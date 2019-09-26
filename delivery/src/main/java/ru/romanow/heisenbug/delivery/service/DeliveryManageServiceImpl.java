@@ -27,8 +27,8 @@ public class DeliveryManageServiceImpl
         implements DeliveryManageService {
     private static final Logger logger = getLogger(DeliveryManageServiceImpl.class);
 
-    public static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
-    public static final String CHECKOUT_PATH = "/checkout";
+    private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
+    private static final String CHECKOUT_PATH = "/checkout";
 
     private final RestTemplate restTemplate;
     private final DeliveryRepository deliveryRepository;
@@ -55,7 +55,7 @@ public class DeliveryManageServiceImpl
     private OrderItemResponse makeWarehouseCheckoutRequest(@Nonnull UUID orderUid) {
         final String url = format("%s%s%s", WAREHOUSE_URL, orderUid, CHECKOUT_PATH);
         try {
-            return ofNullable(restTemplate.getForObject(url, OrderItemResponse.class))
+            return ofNullable(restTemplate.postForObject(url, null, OrderItemResponse.class))
                     .orElseThrow(() -> new RestRequestException("Warehouse returned empty response"));
         } catch (RestClientResponseException exception) {
             final String message = format("Error request to '%s': %d:%s", url, exception.getRawStatusCode(), exception.getResponseBodyAsString());

@@ -1,4 +1,4 @@
-= [Heisenbug Conf] REST API guide
+= [Heisenbug Conf] Сервис доставки REST API
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -7,18 +7,18 @@
 :sectlinks:
 
 
-== Deliver
+== Сервис доставки
 
-Request for delivery. Goes to WH to inform that orderItems should change status to READY_FOR_DELIVERY.
+Запрос на выполнение доставки. Делает запрос к сервису Warehouse для выписывания заказов со склада (перевод в статус READY_FOR_DELIVERY).
 
-Request structure:
+Структура запроса:
 include::{snippets}/deliverySuccess/request-fields.adoc[]
 
-If response is success, return empty response.
+Если запрос выполнился корректно, возвращается 202 Created и пустой ответ.
 
-Example request:
+Пример запроса:
 include::{snippets}/deliverySuccess/http-request.adoc[]
 include::{snippets}/deliverySuccess/http-response.adoc[]
 
-In case of error return
+В случае, если запрос завершился с ошибков, возвращается статус 4xx или 500 и пояснение в теле овтета:
 include::{snippets}/deliveryNotReady/response-body.adoc[]
