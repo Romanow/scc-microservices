@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import ru.romanow.heisenbug.orders.domain.Orders;
+import ru.romanow.heisenbug.orders.domain.Order;
 import ru.romanow.heisenbug.orders.exceptions.RestRequestException;
 import ru.romanow.heisenbug.orders.model.*;
 
@@ -24,7 +24,7 @@ public class OrderManageServiceImpl
     private static final Logger logger = getLogger(OrderManageServiceImpl.class);
 
     private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
-    private static final String DELIVERY_URL = "http://delivery:8090/api/v1/items/";
+    private static final String DELIVERY_URL = "http://delivery:8090/api/v1/delivery/";
     private static final String TAKE_PATH = "/take";
     private static final String STATE_PATH = "/state";
     private static final String DELIVERY_PATH = "/deliver";
@@ -55,7 +55,7 @@ public class OrderManageServiceImpl
     @Nonnull
     @Override
     public OrderInfoResponse status(@Nonnull UUID orderUid) {
-        final Orders order = orderService.getOrderByUid(orderUid);
+        final Order order = orderService.getOrderByUid(orderUid);
         final OrderItemResponse orderInfo = makeWarehouseStateRequest(orderUid);
         return buildOrderInfoResponse(order, orderInfo);
     }
@@ -63,7 +63,7 @@ public class OrderManageServiceImpl
     @Nonnull
     @Override
     public OrderInfoResponse process(@Nonnull UUID orderUid) {
-        final Orders order = orderService.getOrderByUid(orderUid);
+        final Order order = orderService.getOrderByUid(orderUid);
         final OrderItemResponse orderInfo = makeWarehouseStateRequest(orderUid);
 
         makeDeliveryRequest(orderUid, order.getFirstName(), order.getLastName(), order.getAddress());
@@ -73,7 +73,7 @@ public class OrderManageServiceImpl
 
     @Nonnull
     private OrderItemResponse makeWarehouseStateRequest(@Nonnull UUID orderUid) {
-        final String url = format("%s/%s%s", WAREHOUSE_URL, orderUid, STATE_PATH);
+        final String url = format("%s%s%s", WAREHOUSE_URL, orderUid, STATE_PATH);
         try {
             return ofNullable(restTemplate.getForObject(url, OrderItemResponse.class))
                     .orElseThrow(() -> new RestRequestException("Warehouse returned empty response"));
@@ -98,7 +98,7 @@ public class OrderManageServiceImpl
     }
 
     @Nonnull
-    private OrderInfoResponse buildOrderInfoResponse(@Nonnull Orders order, @Nonnull OrderItemResponse orderInfo) {
+    private OrderInfoResponse buildOrderInfoResponse(@Nonnull Order order, @Nonnull OrderItemResponse orderInfo) {
         return new OrderInfoResponse()
                 .setOrderUid(order.getUid())
                 .setState(orderInfo.getState())

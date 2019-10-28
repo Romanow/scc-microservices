@@ -12,7 +12,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Entity
 @Table(name = "orders", schema = "orders")
-public class Orders {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,9 +37,9 @@ public class Orders {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Orders orders = (Orders) o;
-        return Objects.equal(uid, orders.uid) &&
-                Objects.equal(items, orders.items);
+        Order order = (Order) o;
+        return Objects.equal(uid, order.uid) &&
+                Objects.equal(items, order.items);
     }
 
     @Override

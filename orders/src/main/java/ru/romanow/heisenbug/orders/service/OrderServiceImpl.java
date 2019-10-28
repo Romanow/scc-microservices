@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.romanow.heisenbug.orders.domain.Orders;
+import ru.romanow.heisenbug.orders.domain.Order;
 import ru.romanow.heisenbug.orders.model.OrderRequest;
 import ru.romanow.heisenbug.orders.repository.OrdersRepository;
 
@@ -27,8 +27,8 @@ public class OrderServiceImpl
     @Override
     @Transactional
     public void createOrder(@Nonnull UUID orderUid, @Nonnull OrderRequest request) {
-        Orders order =
-                new Orders()
+        Order order =
+                new Order()
                         .setUid(orderUid)
                         .setItems(on(",").join(request.getItemUids()))
                         .setFirstName(request.getFirstName())
@@ -44,7 +44,7 @@ public class OrderServiceImpl
     @Nonnull
     @Override
     @Transactional(readOnly = true)
-    public Orders getOrderByUid(@Nonnull UUID orderUid) {
+    public Order getOrderByUid(@Nonnull UUID orderUid) {
         return ordersRepository.findByUid(orderUid)
                 .orElseThrow(() -> new EntityNotFoundException(format("Order '%s' not found", orderUid)));
     }

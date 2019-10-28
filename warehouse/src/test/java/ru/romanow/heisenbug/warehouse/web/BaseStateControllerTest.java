@@ -34,7 +34,7 @@ public class BaseStateControllerTest
         });
 
         when(warehouseService.orderItemState(eq(ORDER_UID)))
-                .thenReturn(buildOrderItemResponse(ORDER_UID, OrderState.CREATED, ITEMS_SIZE));
+                .thenReturn(buildOrderItemResponse(ORDER_UID, OrderState.READY_FOR_DELIVERY, ITEMS_SIZE));
     }
 
     @Override

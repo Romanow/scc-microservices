@@ -29,8 +29,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
         ids = {
                 "ru.romanow.heisenbug:warehouse:[1.0.0,2.0.0):8070",
         },
-        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
-        stubsMode = StubRunnerProperties.StubsMode.REMOTE)
+//        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
+        stubsMode = StubRunnerProperties.StubsMode.LOCAL)
 class DeliveryManageServiceTest {
     private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
     private static final String CHECKOUT_PATH = "/checkout";

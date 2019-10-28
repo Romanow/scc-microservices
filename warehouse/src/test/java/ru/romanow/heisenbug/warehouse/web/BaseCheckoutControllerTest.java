@@ -33,7 +33,7 @@ public class BaseCheckoutControllerTest
             throw new EntityNotFoundException(format("OrderItem '%s' not found", orderUid));
         });
         when(warehouseService.checkout(eq(ORDER_UID)))
-                .thenReturn(buildOrderItemResponse(ORDER_UID, OrderState.PROCESSING, ITEMS_SIZE));
+                .thenReturn(buildOrderItemResponse(ORDER_UID, OrderState.READY_FOR_DELIVERY, ITEMS_SIZE));
     }
 
     @Override

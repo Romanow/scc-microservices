@@ -1,7 +1,6 @@
 package ru.romanow.heisenbug.orders.service;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +8,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.romanow.heisenbug.orders.OrdersTestConfiguration;
-import ru.romanow.heisenbug.orders.domain.Orders;
+import ru.romanow.heisenbug.orders.domain.Order;
 import ru.romanow.heisenbug.orders.exceptions.RestRequestException;
 import ru.romanow.heisenbug.orders.model.ErrorResponse;
 import ru.romanow.heisenbug.orders.model.OrderInfoResponse;
 import ru.romanow.heisenbug.orders.model.OrderRequest;
+import ru.romanow.heisenbug.orders.model.enums.OrderState;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -30,8 +29,7 @@ import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -42,8 +40,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
                 "ru.romanow.heisenbug:warehouse:[1.0.0,2.0.0):8070",
                 "ru.romanow.heisenbug:delivery:[1.0.0,2.0.0):8090"
         },
-        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
-        stubsMode = StubRunnerProperties.StubsMode.REMOTE)
+//        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
+        stubsMode = StubRunnerProperties.StubsMode.LOCAL)
 class OrderManageServiceImplTest {
     private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
     private static final String STATE_PATH = "/state";
@@ -130,7 +128,7 @@ class OrderManageServiceImplTest {
         when(orderService.getOrderByUid(ORDER_UID_SUCCESS)).thenReturn(buildOrder(ORDER_UID_SUCCESS, itemUids));
         final OrderInfoResponse status = orderManageService.status(ORDER_UID_SUCCESS);
 
-        assertEquals(ORDER_UID_SUCCESS  , status.getOrderUid());
+        assertEquals(ORDER_UID_SUCCESS, status.getOrderUid());
     }
 
     @Test
@@ -172,23 +170,31 @@ class OrderManageServiceImplTest {
     }
 
     @Test
-    @Disabled
-    void processRequestDeliveryError() {
+    void processRequestSuccess() {
         final UUID orderUid = ORDER_UID_SUCCESS;
         when(uuidGenerator.generate()).thenReturn(orderUid);
         final List<UUID> items = newArrayList(randomUUID(), randomUUID());
-        when(orderService.getOrderByUid(orderUid))
-                .thenReturn(buildOrder(orderUid, items));
+        final Order order = buildOrder(orderUid, items);
+        when(orderService.getOrderByUid(orderUid)).thenReturn(order);
 
         final OrderInfoResponse process = orderManageService.process(orderUid);
+        assertEquals(ORDER_UID_SUCCESS, process.getOrderUid());
+        assertEquals(OrderState.READY_FOR_DELIVERY, process.getState());
+        assertEquals(order.getFirstName(), process.getFirstName());
+        assertEquals(order.getLastName(), process.getLastName());
+        assertEquals(order.getAddress(), process.getAddress());
+        assertEquals(items.size(), process.getItems().size());
+        for (UUID itemUid : items) {
+            assertTrue(process.getItems().stream().anyMatch(i -> i.getItemUid().equals(itemUid)));
+        }
     }
 
-    private Orders buildOrder(UUID orderUid, List<UUID> itemUids) {
-        return new Orders()
+    private Order buildOrder(UUID orderUid, List<UUID> itemUids) {
+        return new Order()
                 .setUid(orderUid)
                 .setFirstName(randomAlphabetic(10))
                 .setLastName(randomAlphabetic(10))
-                .setAddress(randomAlphanumeric(20))
+                .setAddress(randomAlphanumeric(10))
                 .setItems(on(",").join(itemUids));
     }
 }

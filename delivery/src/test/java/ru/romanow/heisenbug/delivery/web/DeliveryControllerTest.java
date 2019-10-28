@@ -53,7 +53,6 @@ class DeliveryControllerTest {
     private static final UUID ORDER_UID_SUCCESS = fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
     private static final UUID ORDER_UID_NOT_READY = fromString("fc1f6904-6a27-4fa0-ac05-64233d111a23");
     private static final UUID ORDER_UID_WH_ERROR = fromString("b7db3e82-7ade-464f-a336-dd3b91709781");
-    private static final String UUID_PATTERN = "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}";
     private static final String STRING_VALUE = "";
 
     @MockBean
@@ -77,7 +76,7 @@ class DeliveryControllerTest {
                 .andExpect(status().isAccepted())
                 .andDo(verify()
                         .wiremock(WireMock.post(
-                                urlMatching(format("/api/v1/delivery/%s/deliver", UUID_PATTERN)))
+                                urlMatching(format("/api/v1/delivery/%s/deliver", ORDER_UID_SUCCESS)))
                                 .withRequestBody(matchingJsonPath("$.firstName", new RegexPattern("\\S{10}")))
                                 .withRequestBody(matchingJsonPath("$.lastName", new RegexPattern("\\S{10}")))
                                 .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
@@ -114,7 +113,7 @@ class DeliveryControllerTest {
                 .andExpect(jsonPath("$.message").value(message))
                 .andDo(verify()
                         .wiremock(WireMock.post(
-                                urlMatching(format("/api/v1/delivery/%s/deliver", UUID_PATTERN)))
+                                urlMatching(format("/api/v1/delivery/%s/deliver", orderUid)))
                                 .withRequestBody(matchingJsonPath("$.address", new RegexPattern("\\S{10}")))
                                 .withRequestBody(matchingJsonPath("$.firstName", new RegexPattern("\\S{10}")))
                                 .withRequestBody(matchingJsonPath("$.lastName", new RegexPattern("\\S{10}")))

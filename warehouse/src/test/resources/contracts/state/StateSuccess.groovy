@@ -14,7 +14,7 @@ Contract.make({
         status OK()
         body(
                 orderUid: $(orderUid),
-                state: 'CREATED',
+                state: 'READY_FOR_DELIVERY',
                 items: [
                         [
                                 itemUid: $(anyUuid()),
