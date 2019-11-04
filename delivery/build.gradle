@@ -43,7 +43,7 @@ publishing {
 
 bintray {
     user = 'ronin'
-    key = '794b2d060a453ffc0fd1d6f715a59b4a480d4ca7'
+    key = System.getenv("BINTRAY_TOKEN")
     publications = ['stubs']
     pkg {
         repo = 'heisenbug-contracts'
