@@ -43,7 +43,7 @@ publishing {
 
 bintray {
     user = 'ronin'
-    key = ''
+    key = '794b2d060a453ffc0fd1d6f715a59b4a480d4ca7'
     publications = ['stubs']
     pkg {
         repo = 'heisenbug-contracts'
