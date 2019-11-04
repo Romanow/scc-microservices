@@ -40,8 +40,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
                 "ru.romanow.heisenbug:warehouse:[1.0.0,2.0.0):8070",
                 "ru.romanow.heisenbug:delivery:[1.0.0,2.0.0):8090"
         },
-//        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
-        stubsMode = StubRunnerProperties.StubsMode.LOCAL)
+        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
+        stubsMode = StubRunnerProperties.StubsMode.REMOTE)
 class OrderManageServiceImplTest {
     private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
     private static final String STATE_PATH = "/state";
@@ -184,9 +184,6 @@ class OrderManageServiceImplTest {
         assertEquals(order.getLastName(), process.getLastName());
         assertEquals(order.getAddress(), process.getAddress());
         assertEquals(items.size(), process.getItems().size());
-        for (UUID itemUid : items) {
-            assertTrue(process.getItems().stream().anyMatch(i -> i.getItemUid().equals(itemUid)));
-        }
     }
 
     private Order buildOrder(UUID orderUid, List<UUID> itemUids) {
