@@ -9,6 +9,9 @@ build:
   cache:
     paths:
       - .gradle
+  before_script:
+    - echo "127.0.0.1 warehouse" >> /etc/hosts
+    - echo "127.0.0.1 delivery" >> /etc/hosts
   script:
     - gradle clean build --info
 
