@@ -1,12 +1,15 @@
 package ru.romanow.heisenbug.delivery.service;
 
+import org.junit.ClassRule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.stubrunner.junit.StubRunnerRule;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.romanow.heisenbug.delivery.DeliveryTestConfiguration;
 import ru.romanow.heisenbug.delivery.exceptions.RestRequestException;
@@ -21,13 +24,14 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+@ActiveProfiles("contract-test")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = DeliveryTestConfiguration.class)
 @AutoConfigureStubRunner(
         ids = {
-                "ru.romanow.heisenbug:warehouse:[1.0.0,2.0.0):8070",
+                "ru.romanow.heisenbug:warehouse:1.2.1.RELEASE:stubs:8070",
         },
-        repositoryRoot = "https://dl.bintray.com/ronin/heisenbug-contracts/",
+        repositoryRoot = "https://maven.pkg.github.com/Romanow/scc-microservices",
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
 class DeliveryManageServiceTest {
     private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";

@@ -1,4 +1,4 @@
-rootProject.name = 'heisenbug-conf'
+rootProject.name = 'scc-microservices'
 
 include 'warehouse'
 include 'orders'

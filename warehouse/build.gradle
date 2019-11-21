@@ -1,32 +1,23 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.springframework.cloud:spring-cloud-contract-gradle-plugin:${contractVerifierVersion}"
-    }
+plugins {
+    id "maven-publish"
+    id "org.springframework.cloud.contract" version "2.1.4.RELEASE"
 }
 
-apply plugin: "org.springframework.boot"
-apply plugin: "spring-cloud-contract"
-apply plugin: "maven-publish"
-
 publishing {
+    repositories {
+        maven {
+            url "https://maven.pkg.github.com/Romanow/scc-microservices"
+            credentials {
+                username "Romanow"
+                password "3b467b14954e2e5249b429034bd60e4beb3018b5"
+            }
+        }
+    }
     publications {
         stubs(MavenPublication) {
             artifact verifierStubsJar
             artifactId project.name
         }
-    }
-}
-
-bintray {
-    user = 'ronin'
-    key = System.getenv("BINTRAY_TOKEN")
-    publications = ['stubs']
-    pkg {
-        repo = 'heisenbug-contracts'
-        name = project.name
     }
 }
 
