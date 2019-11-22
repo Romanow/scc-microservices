@@ -1,4 +1,5 @@
 apply plugin: "maven-publish"
+apply plugin: "com.jfrog.bintray"
 apply plugin: "org.asciidoctor.gradle.asciidoctor"
 
 task stubsJar(type: Jar) {
@@ -21,20 +22,22 @@ artifacts {
 }
 
 publishing {
-    repositories {
-        maven {
-            url "https://maven.pkg.github.com/Romanow/scc-microservices"
-            credentials {
-                username "Romanow"
-                password "3b467b14954e2e5249b429034bd60e4beb3018b5"
-            }
-        }
-    }
     publications {
         stubs(MavenPublication) {
             artifact stubsJar
             artifactId project.name
         }
+    }
+}
+
+bintray {
+    user = 'ronin' // System.getenv("BINTRAY_USER")
+    key = "794b2d060a453ffc0fd1d6f715a59b4a480d4ca7" // System.getenv("BINTRAY_TOKEN")
+    publications = ['stubs']
+    publish = true
+    pkg {
+        repo = 'scc-microservices'
+        name = project.name
     }
 }
 

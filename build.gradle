@@ -1,4 +1,5 @@
 plugins {
+    id "com.jfrog.bintray" version "1.8.4" apply false
     id "org.asciidoctor.gradle.asciidoctor" version "1.5.1" apply false
     id "org.springframework.boot" version "2.1.7.RELEASE" apply false
     id "io.spring.dependency-management" version "1.0.5.RELEASE" apply false

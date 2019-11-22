@@ -1,6 +1,6 @@
 rootProject.name = 'scc-microservices'
 
 include 'warehouse'
-include 'orders'
 include 'delivery'
+include 'orders'
 
