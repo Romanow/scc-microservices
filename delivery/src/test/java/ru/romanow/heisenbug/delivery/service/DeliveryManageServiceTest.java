@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.romanow.heisenbug.delivery.DeliveryTestConfiguration;
 import ru.romanow.heisenbug.delivery.exceptions.RestRequestException;
@@ -22,7 +22,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-@ActiveProfiles("contract-test")
+@DirtiesContext
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = DeliveryTestConfiguration.class)
 @AutoConfigureStubRunner(
