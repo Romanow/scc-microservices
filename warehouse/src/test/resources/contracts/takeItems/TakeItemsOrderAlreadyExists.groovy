@@ -17,7 +17,7 @@ Contract.make({
     response {
         status CONFLICT()
         body(
-                message: "OrderItem '" + $(fromRequest().path(3)).clientValue + "' already exists"
+                message: "OrderItem '" + $(fromRequest().path(3)).serverValue + "' already exists"
         )
         headers {
             contentType(applicationJsonUtf8())

@@ -14,5 +14,4 @@ steps:
     commands:
       - echo "127.0.0.1 warehouse" >> /etc/hosts
       - echo "127.0.0.1 delivery" >> /etc/hosts
-      - gradle clean build -p warehouse --info
-      - gradle clean build -p delivery --info
+      - gradle clean build --info

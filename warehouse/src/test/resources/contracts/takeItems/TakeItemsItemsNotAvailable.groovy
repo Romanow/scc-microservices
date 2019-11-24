@@ -20,8 +20,8 @@ Contract.make({
         status NOT_FOUND()
         body(
                 message: 'Items [' +
-                        $(fromRequest().body('$.itemsUid[0]')).clientValue + ',' +
-                        $(fromRequest().body('$.itemsUid[1]')).clientValue +
+                        $(fromRequest().body('$.itemsUid[0]')).serverValue + ',' +
+                        $(fromRequest().body('$.itemsUid[1]')).serverValue +
                         '] is empty (available count = 0)'
         )
         headers {

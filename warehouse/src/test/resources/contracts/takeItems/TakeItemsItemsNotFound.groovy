@@ -20,8 +20,8 @@ Contract.make({
         status NOT_FOUND()
         body(
                 message: 'Not all items [' +
-                        $(fromRequest().body('$.itemsUid[0]')).clientValue + ',' +
-                        $(fromRequest().body('$.itemsUid[1]')).clientValue + '] found'
+                        $(fromRequest().body('$.itemsUid[0]')).serverValue + ',' +
+                        $(fromRequest().body('$.itemsUid[1]')).serverValue + '] found'
         )
         headers {
             contentType(applicationJsonUtf8())
