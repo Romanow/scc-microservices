@@ -23,11 +23,11 @@ Contract.make({
                 state: 'CREATED',
                 items: [
                         [
-                                itemUid: $(fromRequest().body('$.itemsUid[0]')),
+                                itemUid: $(fromRequest().body('$.itemsUid[0]')).serverValue,
                                 name   : $(regex('\\S{10}'))
                         ],
                         [
-                                itemUid: $(fromRequest().body('$.itemsUid[1]')),
+                                itemUid: $(fromRequest().body('$.itemsUid[1]')).serverValue,
                                 name   : $(regex('\\S{10}'))
                         ]
                 ]
