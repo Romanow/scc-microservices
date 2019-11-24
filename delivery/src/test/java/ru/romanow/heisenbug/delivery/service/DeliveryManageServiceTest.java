@@ -1,12 +1,10 @@
 package ru.romanow.heisenbug.delivery.service;
 
-import org.junit.ClassRule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.stubrunner.junit.StubRunnerRule;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +29,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
         ids = {
                 "ru.romanow.heisenbug:warehouse:[1.0.0,2.0.0):stubs:8070",
         },
+        mappingsOutputFolder = "build/mappings",
         repositoryRoot = "https://dl.bintray.com/ronin/scc-microservices",
         stubsMode = StubRunnerProperties.StubsMode.REMOTE)
 class DeliveryManageServiceTest {

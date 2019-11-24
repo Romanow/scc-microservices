@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: build
-    image: gradle:6.0-jdk11
+    image: openjdk:11-jdk
     environment:
       BINTRAY_USER:
         from_secret: BINTRAY_USER
@@ -14,4 +14,4 @@ steps:
     commands:
       - echo "127.0.0.1 warehouse" >> /etc/hosts
       - echo "127.0.0.1 delivery" >> /etc/hosts
-      - gradle clean build --info
+      - ./gradlew clean build --info
