@@ -1,5 +1,7 @@
 # Название: Consumer Driven Development в мире Java
 
+[![Build Status](https://cloud.drone.io/api/badges/Romanow/scc-microservices/status.svg)](https://cloud.drone.io/Romanow/scc-microservices)
+
 1. Проблемы интеграционного тестирования. (время ~10 минут).<br>
 У нас есть много микросервисов и при изменении поведения в одном мы хотим гарантировать, что не нарушается функциональность других. Два подхода:
     1. Развертывание микросервисов:
