@@ -52,6 +52,7 @@ class OrderManageServiceImplTest {
     private static final UUID ORDER_UID_SUCCESS = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
     private static final UUID ORDER_UID_NOT_FOUND = fromString("36856fc6-d6ec-47cb-bbee-d20e78299eb9");
     private static final UUID ORDER_UID_NOT_AVAILABLE = fromString("37bb4049-1d1e-449f-8ada-5422f8886231");
+    private static final UUID ORDER_UID_ALREADY_EXISTS = fromString("45142058-60e6-4cde-ad13-b968180f0367");
 
     @MockBean
     private OrderService orderService;
@@ -81,8 +82,7 @@ class OrderManageServiceImplTest {
 
     @Test
     void makeOrderAlreadyExists() {
-        final UUID generatedOrderUid = randomUUID();
-        when(uuidGenerator.generate()).thenReturn(generatedOrderUid);
+        when(uuidGenerator.generate()).thenReturn(ORDER_UID_ALREADY_EXISTS);
 
         final List<UUID> items = newArrayList(randomUUID(), randomUUID());
         final OrderRequest request =

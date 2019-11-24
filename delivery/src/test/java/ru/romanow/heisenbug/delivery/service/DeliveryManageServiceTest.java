@@ -36,7 +36,8 @@ class DeliveryManageServiceTest {
     private static final String WAREHOUSE_URL = "http://warehouse:8070/api/v1/items/";
     private static final String CHECKOUT_PATH = "/checkout";
 
-    private static final UUID SUCCESS_ORDER_UID = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
+    private static final UUID ORDER_UID_SUCCESS = UUID.fromString("1a1f775c-4f31-4256-bec1-c3d4e9bf1b52");
+    private static final UUID ORDER_UID_NOT_FOUND = UUID.fromString("36856fc6-d6ec-47cb-bbee-d20e78299eb9");
 
     @Autowired
     private DeliveryManageService deliveryManageService;
@@ -48,12 +49,12 @@ class DeliveryManageServiceTest {
                 .setFirstName(randomAlphabetic(10))
                 .setLastName(randomAlphabetic(10))
                 .setAddress(randomAlphabetic(10));
-        deliveryManageService.deliver(SUCCESS_ORDER_UID, request);
+        deliveryManageService.deliver(ORDER_UID_SUCCESS, request);
     }
 
     @Test
     void deliverOrderNotFound() {
-        final UUID orderUid = UUID.randomUUID();
+        final UUID orderUid = ORDER_UID_NOT_FOUND;
         final DeliveryRequest request =
                 new DeliveryRequest()
                         .setFirstName(randomAlphabetic(10))
