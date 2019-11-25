@@ -1,5 +1,4 @@
 plugins {
-    id "com.github.kt3k.coveralls" version "2.8.4"
     id "com.jfrog.bintray" version "1.8.4" apply false
     id "org.asciidoctor.gradle.asciidoctor" version "1.5.1" apply false
     id "org.springframework.boot" version "2.1.7.RELEASE"
@@ -27,13 +26,11 @@ configure(subprojects) { project ->
 
     jacocoTestReport {
         reports {
-            xml.enabled = true
-            html.enabled = true
+            xml.enabled true
+            xml.destination file("${buildDir}/reports/jacoco/report.xml")
+            html.enabled false
+            csv.enabled false
         }
-    }
-
-    coveralls {
-        jacocoReportPath "${buildDir}/reports/jacoco/report/test/jacocoTestReport.xml"
     }
 
     test {

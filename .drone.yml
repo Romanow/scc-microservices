@@ -14,4 +14,4 @@ steps:
     commands:
       - echo "127.0.0.1 warehouse" >> /etc/hosts
       - echo "127.0.0.1 delivery" >> /etc/hosts
-      - gradle clean build --info
+      - gradle clean compileJava test jacocoTestReport --info
